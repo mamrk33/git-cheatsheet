@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}</style></head><body style="margin:0">
+<title>Git Cheat Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* ============ Design tokens ============
+   Layout: sticky toolbar + section index on the left, section cards on the right.
+   Neutrals are pure greys; colour only appears as per-section accents and syntax colours.
+   Dark mode = neon glow on near-black. Light mode = paper with hard ink outlines and marker highlights. */
+:root, .t-light {
+  --bg: #ececec; --bg2: #e2e2e2; --surface: #ffffff; --surface2: #f3f3f3; --code: #f0f0f0;
+  --line: #cdcdcd; --outline: #151515; --dot: #c4c4c4;
+  --fg: #121212; --fg2: #353535; --fg3: #585858;
+  --c-orange: #b23a06; --c-cyan: #005f7c; --c-green: #0a6a34; --c-violet: #5a2ac0;
+  --c-amber: #7a4800; --c-magenta: #a30e66; --c-red: #b3281a;
+  --t-orange: rgba(178,58,6,.13); --t-cyan: rgba(0,95,124,.13); --t-green: rgba(10,106,52,.13);
+  --t-violet: rgba(90,42,192,.12); --t-amber: rgba(122,72,0,.14); --t-magenta: rgba(163,14,102,.12); --t-red: rgba(179,40,26,.12);
+  --hl: rgba(255, 214, 10, .55); --mark: rgba(255, 214, 10, .6);
+  --on-ac: #ffffff;
+  --sx: 6px; --sy: 6px; --ring-w: 0px; --glow-blur: 0px;
+  --hov-x: 3px; --hov-y: 3px; --hov-glow: 0px; --tglow: 0px; --gglow: 0px;
+  --glass: rgba(236,236,236,.92);
+  color-scheme: light;
+}
+:root[data-theme="dark"], .t-dark {
+  --bg: #090909; --bg2: #101010; --surface: #151515; --surface2: #1d1d1d; --code: #0c0c0c;
+  --line: #2b2b2b; --outline: #3a3a3a; --dot: #1d1d1d;
+  --fg: #f4f4f4; --fg2: #cbcbcb; --fg3: #9d9d9d;
+  --c-orange: #ff8c5e; --c-cyan: #52e1ff; --c-green: #5ef2a0; --c-violet: #bfa8ff;
+  --c-amber: #ffd04d; --c-magenta: #ff7ad6; --c-red: #ff8272;
+  --t-orange: rgba(255,140,94,.15); --t-cyan: rgba(82,225,255,.14); --t-green: rgba(94,242,160,.14);
+  --t-violet: rgba(191,168,255,.15); --t-amber: rgba(255,208,77,.14); --t-magenta: rgba(255,122,214,.14); --t-red: rgba(255,130,114,.15);
+  --hl: rgba(255,255,255,0); --mark: rgba(255,208,77,.35);
+  --on-ac: #0a0a0a;
+  --sx: 0px; --sy: 0px; --ring-w: 1px; --glow-blur: 34px;
+  --hov-x: 0px; --hov-y: 0px; --hov-glow: 18px; --tglow: 18px; --gglow: 28px;
+  --glass: rgba(9,9,9,.9);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #090909; --bg2: #101010; --surface: #151515; --surface2: #1d1d1d; --code: #0c0c0c;
+    --line: #2b2b2b; --outline: #3a3a3a; --dot: #1d1d1d;
+    --fg: #f4f4f4; --fg2: #cbcbcb; --fg3: #9d9d9d;
+    --c-orange: #ff8c5e; --c-cyan: #52e1ff; --c-green: #5ef2a0; --c-violet: #bfa8ff;
+    --c-amber: #ffd04d; --c-magenta: #ff7ad6; --c-red: #ff8272;
+    --t-orange: rgba(255,140,94,.15); --t-cyan: rgba(82,225,255,.14); --t-green: rgba(94,242,160,.14);
+    --t-violet: rgba(191,168,255,.15); --t-amber: rgba(255,208,77,.14); --t-magenta: rgba(255,122,214,.14); --t-red: rgba(255,130,114,.15);
+    --hl: rgba(255,255,255,0); --mark: rgba(255,208,77,.35);
+    --on-ac: #0a0a0a;
+    --sx: 0px; --sy: 0px; --ring-w: 1px; --glow-blur: 34px;
+    --hov-x: 0px; --hov-y: 0px; --hov-glow: 18px; --tglow: 18px; --gglow: 28px;
+    --glass: rgba(9,9,9,.9);
+    color-scheme: dark;
+  }
+}
+/* per-section accent */
+.hue-cyan    { --ac: var(--c-cyan);    --ac-t: var(--t-cyan);    --ac-line: rgba(82,225,255,.45);  --ac-glow: rgba(82,225,255,.6); }
+.hue-green   { --ac: var(--c-green);   --ac-t: var(--t-green);   --ac-line: rgba(94,242,160,.45);  --ac-glow: rgba(94,242,160,.6); }
+.hue-violet  { --ac: var(--c-violet);  --ac-t: var(--t-violet);  --ac-line: rgba(191,168,255,.5);  --ac-glow: rgba(191,168,255,.6); }
+.hue-amber   { --ac: var(--c-amber);   --ac-t: var(--t-amber);   --ac-line: rgba(255,208,77,.45);  --ac-glow: rgba(255,208,77,.55); }
+.hue-magenta { --ac: var(--c-magenta); --ac-t: var(--t-magenta); --ac-line: rgba(255,122,214,.45); --ac-glow: rgba(255,122,214,.55); }
+.hue-red     { --ac: var(--c-red);     --ac-t: var(--t-red);     --ac-line: rgba(255,130,114,.5);  --ac-glow: rgba(255,130,114,.55); }
+.hue-orange  { --ac: var(--c-orange);  --ac-t: var(--t-orange);  --ac-line: rgba(255,140,94,.5);   --ac-glow: rgba(255,140,94,.6); }
+
+:root {
+  --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-head: "Bricolage Grotesque", "Manrope", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--hdr, 64px) + 24px); }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 400 15px/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-text-size-adjust: 100%;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
+code, pre, kbd { font-family: var(--f-mono); }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--c-orange); outline-offset: 2px; border-radius: 4px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 1360px; margin: 0 auto; }
+
+/* ---------- header ---------- */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+  background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top-in { max-width: 1360px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding-block: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font: 800 19px/1 var(--f-head); letter-spacing: -.01em; margin-right: 6px; white-space: nowrap; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand b { color: var(--c-orange); font-weight: 800; }
+.search { flex: 1 1 240px; min-width: 0; position: relative; }
+.search input {
+  width: 100%; height: 42px; padding: 0 44px 0 40px; border-radius: 12px; border: 1.5px solid var(--outline);
+  background: var(--surface); color: var(--fg); font: 500 14.5px var(--f-body);
+}
+.search input::placeholder { color: var(--fg3); }
+.search input:focus { outline: none; border-color: var(--c-orange); box-shadow: 0 0 0 3px var(--t-orange); }
+.search .ico { position: absolute; left: 13px; top: 50%; translate: 0 -50%; color: var(--fg3); pointer-events: none; }
+.search kbd {
+  position: absolute; right: 10px; top: 50%; translate: 0 -50%; font-size: 12px; color: var(--fg3);
+  border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; background: var(--surface2);
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 12px;
+  border: 1.5px solid var(--outline); background: var(--surface); font-weight: 700; font-size: 14px; white-space: nowrap;
+  transition: transform .12s, box-shadow .12s, background .12s;
+}
+.btn:hover { box-shadow: var(--hov-x) var(--hov-y) 0 var(--outline), 0 0 var(--hov-glow) var(--c-orange); transform: translate(-1px, -1px); }
+.btn:active { transform: none; }
+.btn.primary { background: var(--c-orange); color: var(--on-ac); }
+.btn.icon { width: 42px; padding: 0; justify-content: center; font-size: 18px; }
+
+/* ---------- hero ---------- */
+.hero { padding-block: 34px 10px; display: grid; gap: 18px; }
+.hero h1 {
+  margin: 0; font: 800 clamp(38px, 7vw, 76px)/.95 var(--f-head); letter-spacing: -.035em; text-wrap: balance;
+}
+.hero h1 .g { color: var(--c-orange); text-shadow: 0 0 var(--gglow) rgba(255,140,94,.6); background: linear-gradient(transparent 60%, var(--hl) 60%); }
+.hero p { margin: 0; max-width: 68ch; color: var(--fg2); font-size: 17px; }
+.prompt { font: 600 15px var(--f-mono); color: var(--fg2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.prompt .d { color: var(--c-green); }
+.prompt .caret { width: 9px; height: 18px; background: var(--c-orange); display: inline-block; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat { border: 1.5px solid var(--outline); border-radius: 999px; padding: 4px 14px; font: 600 13px var(--f-mono); background: var(--surface); }
+.stat b { color: var(--c-orange); }
+
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-block: 14px 6px; }
+.filters .lbl { font: 700 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg3); margin-right: 4px; }
+.chip {
+  height: 34px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface);
+  font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; color: var(--fg2);
+}
+.chip:hover { border-color: var(--fg3); color: var(--fg); }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.legend { margin-left: auto; font-size: 13px; color: var(--fg3); display: flex; gap: 14px; flex-wrap: wrap; }
+
+/* ---------- layout ---------- */
+.layout { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 32px; padding-block: 18px 80px; align-items: start; }
+.side { position: sticky; top: calc(var(--hdr, 64px) + 14px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - var(--hdr, 64px) - 34px); overflow: auto; padding-right: 6px; }
+.side h2 { font: 700 12px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--fg3); margin: 0 0 8px 10px; }
+.side a {
+  display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; text-decoration: none;
+  font-weight: 600; font-size: 14px; color: var(--fg2); border: 1.5px solid transparent;
+}
+.side a .n { margin-left: auto; font: 500 11.5px var(--f-mono); color: var(--fg3); }
+.side a:hover { background: var(--surface); color: var(--fg); }
+.side a.on { background: var(--surface); color: var(--fg); border-color: var(--ac); box-shadow: var(--hov-x) var(--hov-y) 0 var(--outline), 0 0 var(--hov-glow) var(--ac-t); }
+.side a.dim { opacity: .35; }
+.mobnav { display: none; }
+
+/* ---------- sections ---------- */
+.sec {
+  background: var(--surface); border: 1.5px solid var(--outline); border-radius: 18px;
+  margin-bottom: 38px; overflow: clip;
+  box-shadow: var(--sx) var(--sy) 0 var(--ac), 0 0 0 var(--ring-w) var(--ac-line), 0 0 var(--glow-blur) var(--ac-t);
+}
+.sec-h { display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px 16px; border-bottom: 1.5px solid var(--outline); background: var(--surface2); flex-wrap: wrap; }
+.sec-ico {
+  width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 27px; flex: none;
+  background: var(--ac-t); border: 1.5px solid var(--ac);
+}
+.sec-t { flex: 1 1 280px; min-width: 0; }
+.sec-t h2 { margin: 0 0 4px; font: 800 clamp(24px, 3.4vw, 32px)/1.1 var(--f-head); letter-spacing: -.02em; }
+.sec-t h2 span { text-shadow: 0 0 var(--tglow) var(--ac-glow); background: linear-gradient(transparent 58%, var(--hl) 58%); padding: 0 4px; margin-left: -4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.sec-t p { margin: 0; color: var(--fg2); max-width: 78ch; font-size: 14.5px; }
+.sec-acts { display: flex; gap: 8px; }
+.sec-acts .btn { height: 36px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+.sec[data-collapsed="true"] .sec-b { display: none; }
+.sec[data-collapsed="true"] .sec-h { border-bottom: 0; }
+.sec[data-collapsed="true"] .twist { rotate: -90deg; }
+.twist { display: inline-block; transition: rotate .15s; }
+.sec-b { padding: 6px 0 10px; }
+
+.sub {
+  display: flex; align-items: center; gap: 12px; margin: 22px 22px 6px; font: 700 12px var(--f-mono); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ac);
+}
+.sub::after { content: ""; flex: 1; height: 1.5px; background: linear-gradient(90deg, var(--ac), transparent); opacity: .55; }
+.sub:first-child { margin-top: 14px; }
+
+/* ---------- entries ---------- */
+.ent {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: 8px 22px; padding: 12px 22px;
+  border-top: 1px dashed var(--line); position: relative;
+}
+.ent:hover { background: var(--ac-t); }
+.sub + .ent { border-top: 0; }
+.cmdbox { position: relative; min-width: 0; }
+code.cmd {
+  display: block; background: var(--code); border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 44px 9px 13px;
+  font: 600 13.5px/1.5 var(--f-mono); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
+}
+.ent[data-t="danger"] code.cmd { border-color: var(--c-red); }
+.ent[data-t="old"] code.cmd { border-style: dashed; }
+.copy {
+  position: absolute; right: 6px; top: 6px; width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid transparent;
+  background: transparent; display: grid; place-items: center; color: var(--fg3); font-size: 15px;
+}
+.copy:hover { background: var(--surface); border-color: var(--line); color: var(--fg); }
+.copy.ok { color: var(--c-green); border-color: var(--c-green); }
+.ent-d { margin: 0; font-size: 14.5px; color: var(--fg); min-width: 0; overflow-wrap: anywhere; align-self: center; }
+.ent-d code, .note code, .sec-t code, .tip code, .vs-w code, .g-d code, .ex-note code {
+  font: 600 12.5px var(--f-mono); background: var(--code); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; color: var(--fg);
+}
+.more { grid-column: 1 / -1; display: grid; gap: 8px; min-width: 0; }
+.ex {
+  margin: 0; padding: 8px 12px; border-left: 3px dotted var(--ac); background: var(--code); border-radius: 0 8px 8px 0;
+  font: 500 12.5px/1.65 var(--f-mono); overflow-x: auto; white-space: pre; color: var(--fg);
+}
+.ex .ln { display: block; }
+.ex .pr { color: var(--fg3); user-select: none; margin-right: 8px; }
+.ex .cm, .out .cm { color: var(--fg3); font-style: italic; }
+.out { margin: 0; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; font: 500 12.5px/1.6 var(--f-mono); color: var(--fg2); overflow-x: auto; white-space: pre; }
+.out::before { content: "output"; display: block; font: 700 10.5px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--fg3); margin-bottom: 2px; }
+.note { margin: 0; font-size: 13.5px; color: var(--fg2); display: flex; gap: 8px; }
+.note::before { content: "ⓘ"; color: var(--ac); font-weight: 700; flex: none; }
+body.dense .more { display: none; }
+
+/* syntax colours */
+.t-git { color: var(--c-orange); font-weight: 800; }
+.t-sub { color: var(--c-cyan); }
+.t-flag { color: var(--c-amber); }
+.t-arg { color: var(--c-magenta); }
+.t-str { color: var(--c-green); }
+.t-op { color: var(--fg3); }
+.t-pl { color: var(--fg); }
+.t-val { color: var(--c-magenta); }
+:root[data-theme="dark"] code.cmd, .t-dark code.cmd { text-shadow: 0 0 10px rgba(255,255,255,.08); }
+
+/* pills */
+.pill { display: inline-block; font: 700 10.5px/1 var(--f-mono); letter-spacing: .07em; padding: 3px 7px; border-radius: 999px; border: 1.5px solid currentColor; vertical-align: 1px; margin-left: 6px; white-space: nowrap; }
+.pill.new { color: var(--c-green); }
+.pill.old { color: var(--c-amber); }
+.pill.danger { color: var(--c-red); }
+.pill.ver { color: var(--c-cyan); }
+.pill.key { color: var(--fg); border-color: var(--line); }
+
+/* old vs new boxes */
+.vs { padding: 14px 22px 16px; border-top: 1px dashed var(--line); display: grid; gap: 10px; }
+.sub + .vs { border-top: 0; }
+.vs:hover { background: var(--ac-t); }
+.vs-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: stretch; }
+.vs-side { border-radius: 12px; padding: 8px 12px 10px; min-width: 0; border: 1.5px solid var(--line); background: var(--code); }
+.vs-side .lb { font: 800 10.5px var(--f-mono); letter-spacing: .12em; display: block; margin-bottom: 4px; }
+.vs-side code { font: 600 13px/1.5 var(--f-mono); white-space: pre-wrap; overflow-wrap: anywhere; display: block; }
+.vs-old { border-style: dashed; border-color: var(--c-amber); }
+.vs-old .lb { color: var(--c-amber); }
+.vs-new { border-color: var(--c-green); }
+.vs-new .lb { color: var(--c-green); }
+.vs-alt .vs-side { border-color: var(--c-violet); border-style: solid; }
+.vs-alt .lb { color: var(--c-violet); }
+.vs-arrow { align-self: center; font-size: 20px; color: var(--fg3); }
+.vs-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.vs-d { font-weight: 700; font-size: 14.5px; }
+.vd { font: 700 11px var(--f-mono); letter-spacing: .06em; padding: 3px 9px; border-radius: 999px; border: 1.5px solid currentColor; }
+.vd.new { color: var(--c-green); } .vd.both { color: var(--c-cyan); } .vd.alt { color: var(--c-violet); } .vd.old { color: var(--c-amber); }
+.vs-w { margin: 0; font-size: 13.5px; color: var(--fg2); }
+.vs-w::before { content: "When to use which → "; font-weight: 800; color: var(--fg); }
+.copy.s { position: static; display: inline-grid; margin-left: 6px; vertical-align: middle; width: 26px; height: 26px; font-size: 13px; }
+
+.tip { margin: 14px 22px; padding: 12px 16px; border: 1.5px dashed var(--ac); border-radius: 12px; background: var(--ac-t); font-size: 14px; color: var(--fg); display: flex; gap: 12px; }
+.tip::before { content: "💡"; flex: none; }
+.tip b { font-weight: 800; }
+.g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; padding: 6px 22px 12px; }
+.g-i { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 14px; background: var(--code); }
+.g-i b { display: block; font: 800 15px var(--f-head); color: var(--ac); margin-bottom: 2px; }
+.g-d { font-size: 13.5px; color: var(--fg2); }
+.prebox { margin: 10px 22px; padding: 14px 16px; background: var(--code); border: 1.5px solid var(--line); border-radius: 12px; font: 500 13px/1.7 var(--f-mono); overflow-x: auto; white-space: pre; color: var(--fg); }
+.tblwrap { margin: 10px 22px; overflow-x: auto; border: 1.5px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font: 700 11.5px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; background: var(--surface2); color: var(--fg2); }
+td:first-child { font-family: var(--f-mono); font-weight: 700; color: var(--ac); }
+tr:last-child td { border-bottom: 0; }
+.diagram { margin: 10px 22px 6px; overflow-x: auto; border: 1.5px solid var(--line); border-radius: 14px; background: var(--code); }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.diagram text { font-family: var(--f-mono); fill: var(--fg); }
+.diagram .bx { fill: var(--surface); stroke: var(--ac); stroke-width: 2; }
+.diagram .bt { font: 800 16px var(--f-head); }
+.diagram .bs { font-size: 12px; fill: var(--fg3); }
+.diagram .lb { font-size: 13.5px; font-weight: 700; }
+.diagram .stem { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.diagram .fw { stroke: var(--c-green); stroke-width: 2.6; fill: none; }
+.diagram .bk { stroke: var(--c-amber); stroke-width: 2.6; fill: none; }
+.diagram .pl { stroke: var(--c-cyan); stroke-width: 2.6; fill: none; }
+.diagram .mf { fill: var(--c-green); } .diagram .mb { fill: var(--c-amber); } .diagram .mp { fill: var(--c-cyan); }
+.diagram .cm { fill: var(--surface); stroke: var(--fg); stroke-width: 2; }
+.diagram .cmn { fill: var(--surface); stroke: var(--c-magenta); stroke-width: 2.5; }
+.diagram .cmo { fill: none; stroke: var(--fg3); stroke-width: 2; stroke-dasharray: 4 4; }
+.diagram .ln { stroke: var(--fg); stroke-width: 2; fill: none; }
+.diagram .lnm { stroke: var(--c-magenta); stroke-width: 2.5; fill: none; }
+.diagram .tag { font-size: 12px; font-weight: 800; }
+.diagram .cap { font: 600 13px var(--f-body); fill: var(--fg2); }
+.diagram .hd { font: 800 17px var(--f-head); }
+
+.empty { text-align: center; padding: 60px 20px; border: 1.5px dashed var(--outline); border-radius: 18px; color: var(--fg2); font-size: 17px; }
+.foot { border-top: 1.5px solid var(--line); padding-block: 26px 70px; color: var(--fg3); font-size: 13.5px; display: flex; gap: 10px 24px; flex-wrap: wrap; justify-content: space-between; }
+mark { background: var(--mark); color: inherit; border-radius: 3px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; z-index: 200;
+  background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.35); max-width: calc(100vw - 32px);
+}
+
+/* ---------- poster modal ---------- */
+.modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.72); display: grid; place-items: center; padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.dlg { background: var(--bg); color: var(--fg); border: 1.5px solid var(--outline); border-radius: 20px; width: min(1280px, 100%); max-height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; box-shadow: 0 30px 90px rgba(0,0,0,.55); }
+.dlg-h { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1.5px solid var(--line); }
+.dlg-h h2 { margin: 0; font: 800 20px var(--f-head); flex: 1; }
+.ctl { display: flex; gap: 12px 18px; flex-wrap: wrap; align-items: end; padding: 12px 18px; border-bottom: 1.5px solid var(--line); background: var(--surface2); }
+.fld { display: grid; gap: 4px; min-width: 0; }
+.fld > span { font: 700 11px var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--fg3); }
+.fld select { height: 40px; border-radius: 10px; border: 1.5px solid var(--outline); background: var(--surface); color: var(--fg); padding: 0 10px; font: 600 14px var(--f-body); max-width: 100%; }
+.seg { display: inline-flex; border: 1.5px solid var(--outline); border-radius: 10px; overflow: hidden; height: 40px; }
+.seg button { border: 0; background: var(--surface); padding: 0 14px; font-weight: 700; font-size: 14px; color: var(--fg2); }
+.seg button + button { border-left: 1.5px solid var(--outline); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.chk { display: flex; align-items: center; gap: 8px; height: 40px; font-weight: 600; font-size: 14px; }
+.chk input { width: 18px; height: 18px; accent-color: var(--c-orange); }
+.chk input:disabled + span { opacity: .5; }
+.ctl .grow { flex: 1; }
+.dimsbox { align-self: center; color: var(--fg3); font: 600 12.5px var(--f-mono); min-width: 0; }
+.prev { overflow: auto; padding: 16px; background: var(--bg2); position: relative; }
+.prev-in { display: flex; justify-content: center; }
+#pCanvas { display: block; border-radius: 6px; box-shadow: 0 6px 30px rgba(0,0,0,.35); max-width: none; }
+.prog { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.55); color: #fff; font-weight: 800; font-size: 18px; z-index: 3; text-align: center; padding: 20px; }
+.result { padding: 12px 16px; border: 1.5px solid var(--c-green); border-radius: 12px; margin-bottom: 14px; background: var(--t-green); font-size: 14px; }
+.result img { display: block; max-width: 100%; margin-top: 10px; border-radius: 8px; border: 1px solid var(--line); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1020px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .side { display: none; }
+  .mobnav { display: flex; gap: 6px; overflow-x: auto; position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--hdr, 64px)); z-index: 40; padding: 8px 0; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .mobnav::-webkit-scrollbar { display: none; }
+  .mobnav a { flex: none; text-decoration: none; font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg2); white-space: nowrap; }
+  .mobnav a.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  html { scroll-padding-top: calc(var(--hdr, 64px) + 64px); }
+}
+@media (max-width: 760px) {
+  .ent { grid-template-columns: minmax(0, 1fr); padding: 12px 16px; gap: 6px; }
+  .sub, .tip, .prebox, .tblwrap, .diagram, .g-grid { margin-left: 14px; margin-right: 14px; }
+  .g-grid { padding-inline: 0; }
+  .vs { padding-inline: 16px; }
+  .vs-grid { grid-template-columns: minmax(0, 1fr); }
+  .vs-arrow { rotate: 90deg; justify-self: center; }
+  .sec-h { padding: 16px; }
+  .btn .tx { display: none; }
+  .btn { padding: 0 12px; }
+  .btn.primary .tx { display: inline; }
+  .legend { margin-left: 0; }
+  .brand span { display: none; }
+  .search kbd { display: none; }
+  .search input { padding-right: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .prompt .caret { animation: none; }
+  .btn, .twist { transition: none; }
+}
+
+.star { color: var(--c-amber); margin-right: 6px; font-size: 13px; }
+.diagram .lbl { paint-order: stroke; stroke: var(--code); stroke-width: 7px; stroke-linejoin: round; }
+
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7v14M7 14c0-4 4-4 8-4h2" /><circle cx="7" cy="6" r="3" fill="var(--surface)"/><circle cx="7" cy="22" r="3" fill="var(--surface)"/><circle cx="21" cy="10" r="3" fill="var(--c-orange)" stroke="var(--c-orange)"/></svg>
+      <span>git <b>cheat sheet</b></span>
+    </div>
+    <label class="search" for="q">
+      <span id="searchIco"></span>
+      <input id="q" type="search" placeholder="Search commands, flags, problems…  e.g. “undo commit”" autocomplete="off" spellcheck="false" aria-label="Search the cheat sheet">
+      <kbd aria-hidden="true">/</kbd>
+    </label>
+    <button class="btn" id="themeBtn" type="button"></button>
+    <button class="btn primary" id="posterBtn" type="button"><span aria-hidden="true">🖼️</span><span class="tx">Compact view · save as image</span></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <h1 id="h1">The <span class="g">Git</span> cheat sheet</h1>
+    <p>Every command you will realistically need, with examples, the old and new way to do the same thing (and when to use which), and a rescue section for when something went wrong. Click any command to copy it.</p>
+    <div class="prompt" aria-hidden="true"><span class="d">$</span> git log --oneline --graph --all <span class="caret"></span></div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <div class="filters" role="group" aria-label="Filters">
+    <span class="lbl">Show</span>
+    <button class="chip" type="button" data-mode="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-mode="key" aria-pressed="false">★ Essentials</button>
+    <button class="chip" type="button" data-mode="new" aria-pressed="false">NEW modern</button>
+    <button class="chip" type="button" data-mode="old" aria-pressed="false">OLD legacy</button>
+    <button class="chip" type="button" data-mode="danger" aria-pressed="false">💣 Destructive</button>
+    <button class="chip" type="button" id="denseBtn" aria-pressed="false">Hide examples</button>
+    <span id="count" class="lbl" aria-live="polite"></span>
+  </div>
+
+  <nav class="mobnav" id="mobnav" aria-label="Sections"></nav>
+
+  <div class="layout">
+    <nav class="side" id="side" aria-label="Sections"></nav>
+    <main id="main"></main>
+  </div>
+
+  <footer class="foot">
+    <span>Commands tagged with a version (like <b>git 2.23+</b>) need that Git release or newer. Old commands keep working unless marked otherwise.</span>
+    <span>Tip: press <b>/</b> to search.</span>
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="dlg">
+    <div class="dlg-h"><h2 id="mTitle">Compact view · save as image</h2><button class="btn icon" id="closeM" type="button" aria-label="Close">✕</button></div>
+    <div class="ctl">
+      <label class="fld"><span>What to include</span><select id="pScope"></select></label>
+      <div class="fld"><span>Picture theme</span><div class="seg" id="pTheme"><button type="button" data-v="dark" aria-pressed="false">Dark</button><button type="button" data-v="light" aria-pressed="false">Light</button></div></div>
+      <div class="fld"><span>Resolution</span><div class="seg" id="pQual"><button type="button" data-v="2" aria-pressed="false">2×</button><button type="button" data-v="3" aria-pressed="true">3×</button><button type="button" data-v="4" aria-pressed="false">4×</button></div></div>
+      <label class="chk" id="pExLbl"><input type="checkbox" id="pEx" checked><span>Include example lines</span></label>
+      <span class="grow dimsbox" id="dims"></span>
+      <button class="btn primary" id="saveBtn" type="button"><span aria-hidden="true">💾</span> Save PNG</button>
+    </div>
+    <div class="prev" id="prev">
+      <div id="result" class="result" hidden role="status"></div>
+      <div class="prev-in"><canvas id="pCanvas" role="img" aria-label="Preview of the picture that will be saved"></canvas></div>
+      <div class="prog" id="prog" hidden>Preparing preview…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Helpers + sections: model, rosetta, config */
+const SECTIONS = [];
+// entry: command, brief description, options {ex:[], out:'', n:'note', k:1 (essential), t:'danger'|'new'|'old', v:'2.23+'}
+const e = (c, d, o = {}) => ({ c, d, ...o });
+const h = (t) => ({ h: t });
+const g = (term, d) => ({ g: term, d });
+const tip = (t) => ({ tip: t });
+const pre = (t) => ({ pre: t });
+// old-vs-new: o = old command(s), n = new command(s), d = brief, w = when to use which, vd = verdict (new|both|alt|old), k = essential
+const vs = (o, n, d, w, vd = 'new', k = 0, extra = {}) => ({ vs: 1, o, n, d, w, vd, k, ...extra });
+
+SECTIONS.push({
+  id: 'model', ico: '🧠', t: 'How Git Thinks', hue: 'cyan', poster: false,
+  intro: 'Your changes live in four places. Every Git command either moves changes between them or looks at one of them.',
+  items: [
+    { svg: 'areas' },
+    h('Vocabulary'),
+    g('Working tree', 'The files you see and edit on disk.'),
+    g('Index (staging area)', 'The draft of your next commit. `git add` puts changes here.'),
+    g('Commit', 'A snapshot of the whole project plus a message and a pointer to its parent(s). Identified by a SHA hash.'),
+    g('Branch', 'A movable label that points at a commit. Creating one costs almost nothing.'),
+    g('HEAD', 'Where you are right now. Usually points to a branch, which points to a commit.'),
+    g('Detached HEAD', 'HEAD points straight at a commit instead of a branch. Commits made here are lost unless you create a branch.'),
+    g('Remote', 'Another copy of the repo, usually named `origin`.'),
+    g('Remote-tracking branch', 'Your local bookmark of a remote branch (e.g. `origin/main`). Only `fetch`, `pull` and `push` move it.'),
+    g('Upstream', 'The remote branch a local branch is linked to. `git pull` and `git push` use it by default.'),
+    g('Fast-forward', 'Moving a branch pointer forward along a straight line of commits. No merge commit is needed.'),
+    g('Merge base', 'The latest commit two branches have in common.'),
+    g('Ref', 'Any name that points at a commit: branches, tags, HEAD, remote-tracking branches.'),
+    g('Reflog', 'A private log of where HEAD and each branch used to point. Your safety net after mistakes (kept about 90 days).'),
+    g('Stash', 'A shelf for uncommitted work.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'rosetta', ico: '🔁', t: 'Old ↔ New Commands', hue: 'amber',
+  intro: 'Git has grown over 20 years, so many jobs have an old command and a newer one. Old ones nearly always keep working. Verdicts: ✅ prefer the new one · 🤝 both are fine · 🔀 different tools, pick by situation.',
+  items: [
+    tip('`git switch` and `git restore` arrived in Git 2.23 (2019) to split the overloaded `git checkout`. They are now stable (the “experimental” label was dropped), and Git 3.0 plans do **not** remove `git checkout`. So: use the new ones when learning or typing by hand, and don’t panic when you meet `checkout` in scripts, docs and Stack Overflow answers.'),
+    h('Switching branches and restoring files'),
+    vs('git checkout <branch>', 'git switch <branch>', 'Change branch', '`switch` only changes branches, so it cannot accidentally overwrite a file the way `checkout <name>` can when a file and a branch share a name. Use `checkout` for Git older than 2.23 or in old scripts.', 'new', 1),
+    vs('git checkout -b <new>', 'git switch -c <new>', 'Create + switch to a branch', '`-c` means create. Identical result. Add a start point: `git switch -c fix origin/main`.', 'new', 1),
+    vs('git checkout -B <name>', 'git switch -C <name>', 'Create or reset branch to here', 'Force-create: moves the branch to the start point if it already exists. Use with care.', 'new'),
+    vs('git checkout <sha|tag>', 'git switch --detach <sha|tag>', 'Look at an old commit', '`switch` makes you say `--detach` on purpose, which avoids entering detached HEAD by accident.', 'new'),
+    vs('git checkout --orphan <name>', 'git switch --orphan <name>', 'Start a branch with no history', 'Used for things like a clean `gh-pages` branch. Same effect.', 'new'),
+    vs('git checkout -- <file>', 'git restore <file>', 'Discard changes to a file', '`restore` copies the file from the index back into your working tree. Both are destructive: the edits cannot be recovered.', 'new', 1),
+    vs('git checkout .', 'git restore .', 'Discard ALL unstaged changes', 'Same danger as above. Run `git status` first.', 'new'),
+    vs('git checkout <sha> -- <file>', 'git restore --source=<sha> <file>', 'Get a file from another commit', '`restore --source` can also target the index: add `--staged`. Writes to the working tree only by default; `checkout <sha> -- file` also stages it.', 'new', 1),
+    vs('git reset HEAD <file>', 'git restore --staged <file>', 'Unstage a file', '`reset` is a heavy command that also moves branches. For plain unstaging `restore --staged` says what it means. (`git reset -- <file>` still works fine.)', 'new', 1),
+    vs('git checkout -p', 'git restore -p', 'Discard changes chunk by chunk', 'Interactive: Git asks y/n for each hunk.', 'new'),
+    vs('git checkout --ours/--theirs <file>', 'git restore --ours/--theirs <file>', 'Pick a side in a merge conflict', 'Same behaviour. During a rebase “ours” and “theirs” are swapped. `restore --merge <file>` re-creates the conflict markers.', 'both'),
+    h('Branches, remotes, history'),
+    vs('git rev-parse --abbrev-ref HEAD', 'git branch --show-current', 'Print current branch name', 'The new form (Git 2.22) is clear and prints nothing in detached HEAD. The old one prints `HEAD` there, which scripts sometimes rely on.', 'new', 1),
+    vs('git branch --set-upstream origin/x', 'git branch -u origin/x', 'Link branch to its remote', 'The old `--set-upstream` was removed. Use `-u` / `--set-upstream-to=origin/x`, or `git push -u origin x` on first push.', 'new'),
+    vs('git push origin :<branch>', 'git push origin --delete <branch>', 'Delete a remote branch', 'The empty-source refspec means “push nothing to that name”. It works, but `--delete` reads like what it does.', 'new', 1),
+    vs('git remote update', 'git fetch --all', 'Fetch from all remotes', '`fetch --all --prune` is the modern spelling. Set `fetch.prune true` to prune automatically.', 'new'),
+    vs('git remote prune origin', 'git fetch --prune', 'Drop stale remote-tracking branches', 'Both delete local `origin/x` bookmarks whose branch no longer exists on the remote. `fetch --prune` also fetches.', 'both'),
+    vs('git init + git branch -m main', 'git init -b main', 'New repo with a chosen branch name', 'Git 2.28+. Or set it once: `git config --global init.defaultBranch main`. Git 3.0 is planned to default to `main`.', 'new'),
+    vs('git clone --recursive', 'git clone --recurse-submodules', 'Clone including submodules', 'Same thing. `--recursive` is the old name and still works.', 'both'),
+    vs('git whatchanged', 'git log --raw   (or --stat)', 'List commits with changed files', '`whatchanged` is obsolete: it already needs `--i-still-use-this` and is on the removal list. Use `git log --raw` or `git log --name-status`.', 'new'),
+    vs('git merge --abort', 'git reset --merge', 'Abandon a conflicted merge', '`merge --abort` (modern, readable) is almost always what you want. `reset --merge` is the older plumbing-ish equivalent.', 'both'),
+    h('Stashing, config, rewriting'),
+    vs('git stash save "msg"', 'git stash push -m "msg"', 'Stash with a message', '`stash save` is deprecated. `push` also accepts paths: `git stash push -m "wip" -- src/`.', 'new', 1),
+    vs('git config --list · -e · --unset', 'git config list · edit · unset', 'Read/write config', 'Git 2.46 added subcommands: `get`, `set`, `unset`, `list`, `edit`, `rename-section`, `remove-section`. The flag forms still work everywhere, so use them on older machines.', 'both'),
+    vs('git filter-branch', 'git filter-repo', 'Rewrite history (delete a file, split a folder)', '`filter-branch` is slow, easy to get wrong, and Git’s own docs steer you away from it. `git filter-repo` is a separate tool (`pip install git-filter-repo`) that is fast and safe by default.', 'new'),
+    vs('git rebase --preserve-merges', 'git rebase --rebase-merges', 'Rebase but keep merge commits', '`--preserve-merges` was removed in Git 2.34. `--rebase-merges` (`-r`, 2.18+) replaces it and handles conflicts properly.', 'new'),
+    vs('git push --force', 'git push --force-with-lease', 'Overwrite remote history safely', '`--force-with-lease` refuses if someone pushed since your last fetch, so you do not silently destroy their work. Add `--force-if-includes` (2.30+) for extra safety.', 'new', 1),
+    vs('git pull  (merge)', 'git pull --rebase   |   git pull --ff-only', 'Update your branch from the remote', '`pull` = `fetch` + `merge`. Rebase keeps history linear; `--ff-only` refuses anything that is not a clean fast-forward. Set `pull.rebase true` or `pull.ff only` once and stop thinking about it.', 'alt', 1),
+    vs('git bisect good / bad', 'git bisect old / new', 'Binary-search with custom words', 'Same tool. `old`/`new` (2.7+) fit when you hunt for a fix or a speed-up rather than a bug. `--term-old=fast --term-new=slow` makes your own words.', 'both'),
+    h('Same thing, different spelling'),
+    vs('git diff --cached', 'git diff --staged', 'See staged changes', 'Pure synonyms. `--staged` is easier to remember.', 'both'),
+    vs('git add -A   (or: git add .)', 'git add -u', 'What gets staged', '`-A` = new + modified + deleted files anywhere in the repo. `.` does the same but only below the current folder (since Git 2.0). `-u` = only files Git already tracks, so brand-new files are left out.', 'alt'),
+    vs('git commit -a', 'git add -u && git commit', 'Skip the staging step', '`commit -a` stages modified and deleted tracked files, never brand-new files. Handy for small fixes, risky when you want a precise commit.', 'alt'),
+    vs('git merge', 'git rebase', 'Combine branches', 'Merge keeps true history and never rewrites commits. Rebase gives a straight line but rewrites your commits, so only do it on commits that nobody else has. See the Merge and Rebase sections.', 'alt', 1),
+    vs('git revert <sha>', 'git reset --hard <sha>', 'Undo commits', '`revert` adds a new “undo” commit and is safe on shared branches. `reset --hard` moves the branch back and throws work away: only for unpushed commits.', 'alt', 1),
+    vs('GPG signing: gpg.format openpgp', 'SSH signing: gpg.format ssh', 'Sign commits and tags', 'Since Git 2.34 you can sign with the SSH key you already use. Simpler than GPG; both are verified by GitHub/GitLab.', 'alt'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'config', ico: '⚙️', t: 'Setup & Config', hue: 'violet',
+  intro: 'Do these once per machine. Config is layered: system → global (`~/.gitconfig`) → local (`.git/config`). Closer layers win.',
+  items: [
+    h('First-time setup'),
+    e('git config --global user.name "Name"', 'Set the name on your commits', { k: 1, ex: ['git config --global user.name "Ada Lovelace"', 'git config --global user.email "ada@example.com"'] }),
+    e('git config --global init.defaultBranch main', 'New repos start on `main`', { k: 1, v: '2.28+' }),
+    e('git config --global core.editor "code --wait"', 'Editor for commit messages', { ex: ['git config --global core.editor "code --wait"   # VS Code', 'git config --global core.editor "nano"', 'git config --global core.editor "vim"'] }),
+    e('git config --global pull.rebase true', '`git pull` rebases instead of merging', { k: 1, n: 'Alternative: `pull.ff only` to refuse anything but fast-forward. Since Git 2.27 an unconfigured `git pull` on diverged branches warns, and from 2.33 it errors, so pick one.' }),
+    e('git config --global push.autoSetupRemote true', 'First `git push` sets upstream automatically', { k: 1, v: '2.37+', n: 'Removes the “no upstream branch” error and the need for `-u`.' }),
+    e('git config --global fetch.prune true', 'Auto-remove deleted remote branches on fetch'),
+    e('git config --global rerere.enabled true', 'Remember conflict resolutions and replay them', { n: 'rerere = “reuse recorded resolution”. Great when you rebase the same branch repeatedly.' }),
+    e('git config --global merge.conflictStyle zdiff3', 'Show the original text in conflict markers', { v: '2.35+', n: 'Conflict blocks gain a `||||||| base` section. Much easier to resolve. (`diff3` on older Git.)' }),
+    e('git config --global core.autocrlf input', 'Line-ending handling', { n: '`input` on macOS/Linux, `true` on Windows. Better: commit a `.gitattributes` with `* text=auto`.' }),
+    e('git config --global help.autocorrect prompt', 'Offer to fix typos like `git stauts`', { v: '2.46+' }),
+    e('git config --global column.ui auto', 'Print long lists in columns (branch, tag)'),
+    h('Read, change and inspect config'),
+    e('git config --list --show-origin', 'Everything set, and which file it came from', { k: 1 }),
+    e('git config user.email', 'Read one value', { ex: ['git config --get user.email', 'git config get user.email   # new subcommand form (2.46+)'] }),
+    e('git config --global --unset <key>', 'Delete a setting', { ex: ['git config --global --unset http.proxy', 'git config unset --global http.proxy   # 2.46+'] }),
+    e('git config --global -e', 'Open the global config in your editor', { ex: ['git config edit --global   # 2.46+'] }),
+    e('git config --local user.email "work@corp.com"', 'Override for this repo only', { n: 'Scopes: `--system` (all users), `--global` (you), `--local` (this repo, default when writing), `--worktree`.' }),
+    e('git config --global includeIf."gitdir:~/work/".path ~/.gitconfig-work', 'Different identity for different folders', { ex: ['# ~/.gitconfig', '[includeIf "gitdir:~/work/"]', '    path = ~/.gitconfig-work'] }),
+    e('git config --global alias.st "status -sb"', 'Create a shortcut (see Files & Aliases)', { k: 1 }),
+    h('Credentials & signing'),
+    e('git config --global credential.helper osxkeychain', 'Cache passwords/tokens', { ex: ['git config --global credential.helper osxkeychain   # macOS', 'git config --global credential.helper manager      # Windows / Git Credential Manager', 'git config --global credential.helper "cache --timeout=3600"   # Linux, in memory', 'git config --global credential.helper store         # plain text file: avoid'], n: 'For GitHub/GitLab prefer SSH keys or a personal access token. Passwords no longer work on most hosts.' }),
+    e('git config --global gpg.format ssh', 'Sign commits with your SSH key', { v: '2.34+', ex: ['git config --global gpg.format ssh', 'git config --global user.signingkey ~/.ssh/id_ed25519.pub', 'git config --global commit.gpgsign true'] }),
+    e('git config --global --add safe.directory <path>', 'Fix “dubious ownership” errors', { n: 'Appears when a repo is owned by a different user (Docker, WSL, shared drives).' }),
+    h('Create & clone'),
+    e('git init', 'Turn the current folder into a repo', { k: 1, ex: ['git init', 'git init -b main            # choose branch name (2.28+)', 'git init my-project       # create folder + init', 'git init --bare repo.git   # server-style repo, no working tree'] }),
+    e('git clone <url>', 'Copy a remote repo (all history)', { k: 1, ex: ['git clone https://github.com/user/repo.git', 'git clone git@github.com:user/repo.git my-folder   # SSH, custom folder name', 'git clone -b develop --single-branch <url>         # one branch only'] }),
+    e('git clone --depth 1 <url>', 'Shallow clone: latest commit only', { ex: ['git clone --depth 1 <url>', 'git fetch --unshallow     # later: get the full history'] }),
+    e('git clone --filter=blob:none <url>', 'Partial clone: history now, file contents on demand', { v: '2.19+', n: 'Fast clone of huge repos while keeping full history. `--filter=tree:0` is even lighter.' }),
+    e('git clone --recurse-submodules <url>', 'Clone including submodules', { ex: ['git clone --recurse-submodules <url>', '# forgot? run inside the clone:', 'git submodule update --init --recursive'] }),
+    e('git clone --mirror <url>', 'Exact backup copy of all refs', { n: 'Use for moving a repo to a new host: `git push --mirror <new-url>`.' }),
+    h('Get help'),
+    e('git help <command>', 'Open the manual page', { k: 1, ex: ['git help rebase', 'git rebase --help', 'git rebase -h      # short usage summary in the terminal', 'git help -g        # list the concept guides (gitworkflows, gitglossary ...)'] }),
+    e('git version', 'Which Git am I running?', { ex: ['git version', 'git version --build-options'] }),
+  ],
+});
+
+/* Sections: stage, inspect, branch, merge */
+SECTIONS.push({
+  id: 'stage', ico: '📸', t: 'Stage & Commit', hue: 'green',
+  intro: 'The everyday loop: look at what changed, choose what goes in the next snapshot (stage), then commit it.',
+  items: [
+    h('Look'),
+    e('git status', 'What changed, what is staged, what is untracked', { k: 1 }),
+    e('git status -sb', 'Short format with branch and ahead/behind', { k: 1, out: '## main...origin/main [ahead 1]\n M src/app.js      # modified, not staged\nM  README.md       # staged\nMM index.html      # staged AND modified again\n?? notes.txt       # untracked\nA  new.css         # staged new file', n: 'Left column = staged, right column = working tree.' }),
+    h('Stage'),
+    e('git add <file>', 'Stage a file (or folder)', { k: 1, ex: ['git add src/app.js', 'git add src/ docs/', 'git add "*.css"        # quote globs so Git expands them (matches in subfolders too)'] }),
+    e('git add -p', 'Stage selected chunks (hunks) only', { k: 1, ex: ['git add -p', 'git add -p src/app.js', '# y = stage, n = skip, s = split, e = edit, q = quit, ? = help'], n: 'The best habit for clean commits: review every hunk as you stage it.' }),
+    e('git add .', 'Stage everything in this folder and below', { n: 'Includes new, modified and deleted files (since Git 2.0). Check `git status` first so you don’t add secrets or build output.' }),
+    e('git add -A', 'Stage everything in the whole repo', { ex: ['git add -A   # same as: git add --all'] }),
+    e('git add -u', 'Stage only already-tracked files (modified + deleted)', { n: 'Ignores brand-new files.' }),
+    e('git add -N <file>', 'Intent to add: show a new file in `git diff` before staging', { ex: ['git add -N newfile.js && git diff'] }),
+    e('git restore --staged <file>', 'Unstage a file (keep the edits)', { k: 1, t: 'new', v: '2.23+', n: 'Old way: `git reset HEAD <file>`.', ex: ['git restore --staged src/app.js', 'git restore --staged .      # unstage everything'] }),
+    h('Commit'),
+    e('git commit -m "message"', 'Commit what is staged', { k: 1, ex: ['git commit -m "Fix login redirect"', 'git commit -m "Add search" -m "Longer body paragraph explaining why."   # second -m = body'] }),
+    e('git commit', 'Commit and write the message in your editor', { n: 'Good format: a ≤50-char summary, a blank line, then a body wrapped at ~72 chars explaining *why*.' }),
+    e('git commit -am "message"', 'Stage tracked changes and commit in one go', { n: 'Does not include new (untracked) files.' }),
+    e('git commit -v', 'Show the diff in the editor while writing the message'),
+    e('git commit --amend', 'Replace the last commit (new message and/or staged changes)', { k: 1, t: 'danger', n: 'Rewrites history. Only do it if the commit is not pushed (or you will force-push).', ex: ['git commit --amend -m "Better message"', 'git add forgotten.js && git commit --amend --no-edit   # add a file, keep message'] }),
+    e('git commit --amend --reset-author', 'Reset the author/date of the last commit to the current identity', { t: 'danger', ex: ['git commit --amend --author="Ada <ada@example.com>" --no-edit'] }),
+    e('git commit --fixup <sha>', 'Create a “fix this earlier commit” commit', { ex: ['git commit --fixup a1b2c3d', 'git rebase -i --autosquash main   # automatically folds it into a1b2c3d'], n: 'Needs `rebase -i --autosquash` afterwards. Set `rebase.autoSquash true` to always do it.' }),
+    e('git commit --allow-empty -m "msg"', 'Commit with no changes', { ex: ['git commit --allow-empty -m "ci: trigger build"'] }),
+    e('git commit -S -m "msg"', 'Sign the commit (GPG or SSH key)', { ex: ['git commit -S -m "Signed commit"', 'git log --show-signature -1'] }),
+    e('git commit --no-verify', 'Skip pre-commit / commit-msg hooks', { t: 'danger', n: 'Use rarely. Hooks usually exist for a reason.' }),
+    e('git commit -F message.txt', 'Take the message from a file'),
+    h('Remove & rename'),
+    e('git rm <file>', 'Delete a file and stage the deletion', { k: 1, ex: ['git rm old.js', 'git rm -r old-folder/'] }),
+    e('git rm --cached <file>', 'Stop tracking a file but keep it on disk', { k: 1, ex: ['git rm --cached .env', 'echo ".env" >> .gitignore', 'git rm -r --cached .   # untrack everything, then `git add .` to re-apply .gitignore'] }),
+    e('git mv <old> <new>', 'Rename or move a file (and stage it)', { k: 1, ex: ['git mv utils.js lib/utils.js', 'git mv readme.md README.md'], n: 'Git detects renames by content, so plain `mv` + `git add -A` gives the same result.' }),
+    tip('Rule of thumb: one logical change per commit, written so that `git log --oneline` reads like a changelog. Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`) are a popular style.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'inspect', ico: '🔍', t: 'Inspect & Compare', hue: 'cyan',
+  intro: 'Read history, compare versions, find who changed what.',
+  items: [
+    h('log: history'),
+    e('git log --oneline --graph --decorate --all', 'Compact branch graph of everything', { k: 1, out: '* 3f2a1bc (HEAD -> feature) Add search box\n| * 9c8d7e6 (origin/main, main) Fix typo\n|/\n* 1a2b3c4 Initial layout', ex: ['git config --global alias.lg "log --oneline --graph --decorate --all"   # then just: git lg'] }),
+    e('git log', 'Full history of the current branch', { k: 1, ex: ['git log -5                 # last 5 commits', 'git log --oneline          # one line per commit', 'git log --stat             # files changed per commit', 'git log -p                 # full diff per commit', 'git log --reverse          # oldest first'] }),
+    e('git log --author="Ada"', 'Filter by author', { ex: ['git log --author="Ada" --since="2 weeks ago"', 'git log --since="2026-01-01" --until="2026-03-31"'] }),
+    e('git log --grep="login"', 'Search commit messages', { ex: ['git log --grep="fix" -i --oneline    # -i = ignore case'] }),
+    e('git log -S"text"', 'Find commits that added/removed a string (pickaxe)', { k: 1, ex: ['git log -S"calculateTotal" --oneline', 'git log -G"user_?id" -p          # -G = regex over changed lines'], n: '“When did this line appear or disappear?”' }),
+    e('git log -L :<func>:<file>', 'History of one function or line range', { ex: ['git log -L :parseDate:src/date.js', 'git log -L 40,60:src/app.js'] }),
+    e('git log -- <path>', 'History of a file or folder', { k: 1, ex: ['git log -- src/app.js', 'git log --follow -p -- src/app.js    # follow renames', 'git log --all --full-history -- deleted.txt   # when was it deleted?'] }),
+    e('git log main..feature', 'Commits on feature that main lacks', { k: 1, ex: ['git log origin/main..HEAD     # what I have not pushed', 'git log HEAD..origin/main     # what I have not pulled', 'git log main...feature --left-right --oneline   # differences both ways'] }),
+    e('git log --first-parent', 'Follow only the main line (hides merged branch commits)', { ex: ['git log --first-parent --merges --oneline main'] }),
+    e('git log --pretty=format:"%h %an %ar %s"', 'Custom output format', { ex: ['git log --pretty=format:"%h %an %ad %s" --date=short', '# %h short hash  %H full  %an author  %ar relative date  %s subject  %d refs', 'git log -1 --format=%H     # full hash of last commit'] }),
+    e('git shortlog -sn --no-merges', 'Commits per author, ranked', { ex: ['git shortlog -sn --since="1 year ago"'] }),
+    h('show & diff'),
+    e('git show <commit>', 'Show one commit (message + diff)', { k: 1, ex: ['git show', 'git show a1b2c3d', 'git show HEAD~2 --stat', 'git show v1.0.0'] }),
+    e('git show <rev>:<path>', 'Print a file as it was at a revision', { ex: ['git show HEAD~3:src/app.js', 'git show main:README.md > old-readme.md'] }),
+    e('git diff', 'Unstaged changes (working tree vs index)', { k: 1, out: 'diff --git a/app.js b/app.js\n@@ -10,3 +10,4 @@ function init() {\n   load();\n-  render(old);\n+  render(next);\n+  track();' }),
+    e('git diff --staged', 'Staged changes (what the next commit contains)', { k: 1, ex: ['git diff --staged        # same as --cached', 'git diff --staged src/app.js'] }),
+    e('git diff HEAD', 'All uncommitted changes (staged + unstaged)', { k: 1 }),
+    e('git diff <a> <b>', 'Compare any two commits/branches/tags', { ex: ['git diff main feature', 'git diff v1.0 v2.0 --stat', 'git diff HEAD~3 HEAD -- src/'] }),
+    e('git diff main...feature', 'Changes on feature since it split from main', { n: 'Three dots = compare against the merge base. This is what a pull request shows. Two dots (`main..feature`) compare the two tips directly.' }),
+    e('git diff --stat', 'Summary: files and +/- counts', { ex: ['git diff --stat', 'git diff --name-only', 'git diff --name-status   # A/M/D per file', 'git diff --shortstat'] }),
+    e('git diff --word-diff', 'Highlight word-level changes', { ex: ['git diff --word-diff', 'git diff --color-words'] }),
+    e('git diff -w', 'Ignore whitespace changes', { ex: ['git diff -w', 'git diff --ignore-all-space --ignore-blank-lines'] }),
+    e('git diff --check', 'Warn about whitespace errors and conflict markers', { ex: ['git diff --check   # nice in a pre-commit hook'] }),
+    e('git difftool', 'View diffs in an external tool (VS Code, meld…)', { ex: ['git config --global diff.tool vscode', 'git config --global difftool.vscode.cmd \'code --wait --diff $LOCAL $REMOTE\'', 'git difftool main..feature'] }),
+    h('blame & search'),
+    e('git blame <file>', 'Who last changed each line', { k: 1, ex: ['git blame src/app.js', 'git blame -L 40,60 src/app.js     # only these lines', 'git blame -w -C -C src/app.js     # ignore whitespace, detect moved code', 'git blame --ignore-rev a1b2c3d src/app.js'], n: 'Keep a `.git-blame-ignore-revs` file for formatting-only commits and set `blame.ignoreRevsFile`.' }),
+    e('git grep "text"', 'Search tracked files (fast)', { k: 1, ex: ['git grep -n "TODO"                # line numbers', 'git grep -i -w "token" -- "*.js"   # whole word, JS only', 'git grep -c "import"              # counts per file', 'git grep "init" v1.0               # search at a tag/commit', 'git grep -p "init" src/            # show enclosing function'] }),
+    e('git ls-files', 'List tracked files', { ex: ['git ls-files "*.md"', 'git ls-files -m                   # modified', 'git ls-files -o --exclude-standard   # untracked, not ignored', 'git ls-files --deleted'] }),
+    e('git describe --tags', 'Human-friendly name: nearest tag + distance', { out: 'v2.1.0-14-g3f2a1bc   # 14 commits after tag v2.1.0', ex: ['git describe --tags --always --dirty'] }),
+    e('git whatchanged', 'Obsolete: use `git log --raw` instead', { t: 'old' }),
+  ],
+});
+
+SECTIONS.push({
+  id: 'branch', ico: '🌿', t: 'Branches', hue: 'green',
+  intro: 'A branch is just a movable pointer, so create them freely. `git switch` is the modern way to move around; `git checkout` still works.',
+  items: [
+    h('List & inspect'),
+    e('git branch', 'List local branches (* = current)', { k: 1, ex: ['git branch -a    # local + remote-tracking', 'git branch -r    # remote-tracking only', 'git branch --show-current    # just the name (2.22+)'] }),
+    e('git branch -vv', 'Branches with last commit and upstream/ahead-behind', { k: 1, out: '* feature  3f2a1bc [origin/feature: ahead 2] Add search\n  main     9c8d7e6 [origin/main] Fix typo' }),
+    e('git branch --merged', 'Branches already merged into the current one', { ex: ['git branch --merged main            # safe to delete', 'git branch --no-merged main         # still has unique work', 'git branch --contains a1b2c3d     # which branches include this commit?', 'git branch --sort=-committerdate   # most recent first'] }),
+    h('Switch & create (new)'),
+    e('git switch <branch>', 'Move to an existing branch', { k: 1, t: 'new', v: '2.23+', ex: ['git switch main', 'git switch feature   # if only origin/feature exists, this creates a tracking branch for you'], n: 'Old way: `git checkout <branch>`.' }),
+    e('git switch -c <new>', 'Create a branch and switch to it', { k: 1, t: 'new', v: '2.23+', ex: ['git switch -c feature/login', 'git switch -c hotfix origin/main     # start from a specific point', 'git switch -c new-branch a1b2c3d     # start from a commit'], n: 'Old way: `git checkout -b <new>`.' }),
+    e('git switch -', 'Jump back to the previous branch', { k: 1, ex: ['git switch -   # like cd -'] }),
+    e('git switch --detach <commit>', 'Look at an old commit (detached HEAD)', { ex: ['git switch --detach v1.0.0', '# need to keep work done here?', 'git switch -c rescue'] }),
+    e('git switch -C <name>', 'Create, or reset an existing branch to the current commit', { t: 'danger' }),
+    h('Switch & create (old, still valid)'),
+    e('git checkout <branch>', 'Switch branch', { t: 'old', ex: ['git checkout main'] }),
+    e('git checkout -b <new> [<start>]', 'Create + switch', { t: 'old', ex: ['git checkout -b feature origin/feature'] }),
+    e('git checkout --track origin/<branch>', 'Create a local branch tracking a remote one', { t: 'old', n: 'Modern: `git switch <branch>` or `git switch -c <name> --track origin/<branch>`.' }),
+    h('Rename, delete, track'),
+    e('git branch -m <new-name>', 'Rename the current branch', { k: 1, ex: ['git branch -m main', 'git branch -m old-name new-name', '# also rename on the remote:', 'git push origin -u new-name', 'git push origin --delete old-name'] }),
+    e('git branch -d <branch>', 'Delete a merged branch (refuses if unmerged)', { k: 1, ex: ['git branch -d feature/login'] }),
+    e('git branch -D <branch>', 'Force-delete a branch even if unmerged', { t: 'danger', n: 'Lost it? `git reflog` shows the old tip. See Undo & Recover.' }),
+    e('git branch -u origin/<branch>', 'Set the upstream of the current branch', { k: 1, ex: ['git branch -u origin/main', 'git branch --set-upstream-to=origin/main', 'git branch --unset-upstream'] }),
+    e('git branch <name> <commit>', 'Create a branch at a commit without switching', { ex: ['git branch backup', 'git branch hotfix v1.2.0'] }),
+    e('git branch -c <old> <new>', 'Copy a branch', { v: '2.15+' }),
+    h('Cleanup'),
+    e('git branch --merged | grep -v "main" | xargs git branch -d', 'Delete all merged branches', { ex: ['git branch --merged main | grep -vE "^\\*|main|develop" | xargs -n1 git branch -d', 'git fetch --prune   # then remove stale origin/* bookmarks'], n: 'Dry-run by running the first half alone.' }),
+    tip('Detached HEAD is not an error: it just means HEAD points to a commit instead of a branch. Anything you commit there is only reachable from HEAD. Run `git switch -c <name>` before leaving to keep it.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'merge', ico: '🔀', t: 'Merge & Conflicts', hue: 'magenta',
+  intro: 'Combine branches without rewriting history. Merging is always safe to undo while it is local.',
+  items: [
+    { svg: 'mergerebase' },
+    h('Merge'),
+    e('git merge <branch>', 'Merge a branch into the current one', { k: 1, ex: ['git switch main', 'git merge feature'], n: 'Fast-forwards if possible; otherwise creates a merge commit.' }),
+    e('git merge --no-ff <branch>', 'Always create a merge commit', { k: 1, n: 'Keeps the feature branch visible in history.' }),
+    e('git merge --ff-only <branch>', 'Merge only if it fast-forwards, else stop', { k: 1, n: 'Safe for “just update me” on main. Set `merge.ff only` to make it the default.' }),
+    e('git merge --squash <branch>', 'Stage all branch changes as one, no merge commit', { ex: ['git merge --squash feature', 'git commit -m "Add login feature"'], n: 'You must run `git commit` afterwards. History of the branch is not linked.' }),
+    e('git merge --no-commit --no-ff <branch>', 'Merge, but stop so you can inspect before committing'),
+    e('git merge --abort', 'Cancel a merge that has conflicts', { k: 1, n: 'Old way: `git reset --merge`.' }),
+    e('git merge --continue', 'Finish the merge after resolving conflicts', { ex: ['git add resolved.js', 'git merge --continue   # same as: git commit'] }),
+    e('git merge -X theirs <branch>', 'On conflict prefer one side automatically', { t: 'danger', ex: ['git merge -X theirs feature   # prefer the incoming change', 'git merge -X ours feature     # prefer my change (only for conflicting hunks)'], n: 'Different from `-s ours`, which discards the other branch’s changes completely.' }),
+    e('git merge --autostash <branch>', 'Stash local changes first, reapply after', { v: '2.27+' }),
+    h('Resolve conflicts'),
+    pre('<<<<<<< HEAD            ← your branch (ours)\nconst port = 3000;\n=======\nconst port = 8080;       ← incoming branch (theirs)\n>>>>>>> feature\n\n1. git status               list "both modified" files\n2. edit the file            keep one side or combine; delete the <<< === >>> lines\n3. git add <file>           mark as resolved\n4. git commit               (or git merge --continue / git rebase --continue)'),
+    e('git diff --name-only --diff-filter=U', 'List files that still have conflicts', { k: 1, ex: ['git status', 'git ls-files -u'] }),
+    e('git restore --ours <file>', 'Take my version of a conflicted file', { ex: ['git restore --ours  src/app.js && git add src/app.js', 'git restore --theirs src/app.js && git add src/app.js'], n: 'Old way: `git checkout --ours <file>`. During a rebase, ours/theirs are swapped (ours = the branch you rebase onto).' }),
+    e('git restore --merge <file>', 'Put the conflict markers back (undo a bad resolution)', { ex: ['git restore --conflict=zdiff3 src/app.js   # with the base version shown'], n: 'Old way: `git checkout -m <file>`.' }),
+    e('git mergetool', 'Resolve conflicts in a visual tool', { ex: ['git config --global merge.tool vscode', 'git config --global mergetool.keepBackup false', 'git mergetool'] }),
+    e('git log --merge --oneline', 'Show only the commits involved in the conflict', {}),
+    e('git merge-base <a> <b>', 'Find the common ancestor of two branches', { ex: ['git merge-base main feature', 'git merge-base --is-ancestor v1.0 main && echo "v1.0 is in main"'] }),
+    e('git rerere', 'Reuse recorded conflict resolutions', { n: 'Turn on once with `git config --global rerere.enabled true` and Git will replay your past resolutions automatically.' }),
+    vs('git merge main  (into feature)', 'git rebase main  (feature onto main)', 'Update a feature branch', 'Merge: keeps exact history, safe on shared branches, adds merge commits. Rebase: linear history, but rewrites the branch, so do it only on branches nobody else uses (and force-push with lease afterwards).', 'alt', 1),
+  ],
+});
+
+/* Sections: rebase, pick, remote, undo, stash, tags */
+SECTIONS.push({
+  id: 'rebase', ico: '🧬', t: 'Rebase & Rewrite History', hue: 'violet',
+  intro: 'Rebase replays your commits on top of another base. Great for tidy history. The golden rule: never rebase commits that other people already have.',
+  items: [
+    h('Rebase'),
+    e('git rebase <base>', 'Replay my commits on top of <base>', { k: 1, ex: ['git switch feature', 'git rebase main            # feature now starts at the tip of main', 'git rebase origin/main      # after git fetch'], n: 'Conflicts? Fix them, `git add`, then `git rebase --continue`.' }),
+    e('git rebase --continue | --skip | --abort', 'Control a rebase that stopped', { k: 1, ex: ['git rebase --continue   # after resolving + git add', 'git rebase --skip       # drop the commit that is conflicting', 'git rebase --abort      # go back to how things were'] }),
+    e('git rebase --onto <newbase> <oldbase> [<branch>]', 'Move a range of commits somewhere else', { ex: ['git rebase --onto main featureA featureB', '# featureB was based on featureA; move it straight onto main', 'git rebase --onto HEAD~3 HEAD~1   # remove the middle commit'], n: 'Reads as: “take commits after <oldbase> up to <branch> and put them on <newbase>”.' }),
+    e('git rebase --autostash <base>', 'Stash/unstash around the rebase', { ex: ['git config --global rebase.autoStash true'] }),
+    e('git rebase --rebase-merges <base>', 'Rebase while keeping merge commits', { v: '2.18+', n: 'Replaces the removed `--preserve-merges`.' }),
+    e('git rebase --update-refs <base>', 'Also move other branches that point into the stack', { v: '2.38+', n: 'For stacked branches (a → b → c). Set `rebase.updateRefs true`.' }),
+    e('git pull --rebase', 'Fetch then rebase my local commits onto the remote', { k: 1, ex: ['git pull --rebase', 'git config --global pull.rebase true   # make it the default'] }),
+    e('git push --force-with-lease', 'Publish rebased history safely', { k: 1, t: 'danger', n: 'Fails if the remote has commits you have not seen. Plain `--force` would destroy them.' }),
+    h('Interactive rebase: edit the last N commits'),
+    e('git rebase -i HEAD~<n>', 'Edit, reorder, squash or drop the last n commits', { k: 1, t: 'danger', ex: ['git rebase -i HEAD~4', 'git rebase -i main           # everything since main', 'git rebase -i --root         # including the very first commit'] }),
+    pre('pick   a1b2c3d Add login form       p  keep the commit as is\nreword d4e5f6a Fix typo in readme   r  keep changes, edit the message\nedit   0a1b2c3 Add API client       e  stop here so I can change the commit (amend / split)\nsquash 7d8e9f0 Tweak API client     s  meld into previous commit, combine messages\nfixup  2b3c4d5 Oops forgot import   f  meld into previous commit, discard this message\ndrop   9e8d7c6 Debug logging        d  delete the commit\nexec   npm test                     x  run a command after the previous commit\n\nLines run top to bottom = oldest to newest. Reorder lines to reorder commits.'),
+    e('git rebase -i --autosquash <base>', 'Auto-arrange `fixup!`/`squash!` commits', { ex: ['git commit --fixup a1b2c3d', 'git rebase -i --autosquash a1b2c3d~1', 'git config --global rebase.autoSquash true'] }),
+    e('git rebase -x "<cmd>" <base>', 'Run a command on every commit (e.g. tests)', { ex: ['git rebase -x "npm test" main    # stops at the first failing commit'] }),
+    e('git rebase --edit-todo', 'Change the plan mid-rebase'),
+    h('Handy shortcuts for “rewrite the last commits”'),
+    e('git reset --soft HEAD~<n> && git commit', 'Squash the last n commits into one', { ex: ['git reset --soft HEAD~3', 'git commit -m "Add search feature"'], n: 'Simpler than interactive rebase when you just want everything in one commit.' }),
+    e('git range-diff <old-range> <new-range>', 'Compare two versions of a patch series', { v: '2.19+', ex: ['git range-diff main@{1}...HEAD    # before vs after a rebase', 'git range-diff main old-feature new-feature'] }),
+    vs('git merge', 'git rebase', 'Which one?', 'Rebase before sharing (to tidy your own work and update from main). Merge when the branch is already public, or when you want the record of a real merge. Never rebase `main`.', 'alt', 1),
+  ],
+});
+
+SECTIONS.push({
+  id: 'pick', ico: '🍒', t: 'Cherry-pick & Revert', hue: 'amber',
+  intro: 'Copy a commit to another branch, or undo one by adding its opposite.',
+  items: [
+    h('Cherry-pick: copy commits'),
+    e('git cherry-pick <commit>', 'Apply one commit onto the current branch', { k: 1, ex: ['git switch release-1.2', 'git cherry-pick a1b2c3d', 'git cherry-pick a1b2c3d d4e5f6a    # several'], n: 'Creates a new commit with a different hash.' }),
+    e('git cherry-pick <a>^..<b>', 'Copy a range (a through b, inclusive)', { ex: ['git cherry-pick a1b2c3d^..f6e5d4c', 'git cherry-pick main~3..main    # last 3 commits of main'] }),
+    e('git cherry-pick -x <commit>', 'Add “(cherry picked from commit …)” to the message', { ex: ['git cherry-pick -x a1b2c3d   # useful for hotfix backports'] }),
+    e('git cherry-pick -n <commit>', 'Apply the changes but do not commit', { ex: ['git cherry-pick -n a1b2c3d d4e5f6a   # then commit them together'] }),
+    e('git cherry-pick -m 1 <merge-commit>', 'Pick a merge commit (choose parent 1)'),
+    e('git cherry-pick --continue | --skip | --abort', 'After a conflict', { k: 1 }),
+    e('git cherry -v <upstream>', 'Which of my commits are not in <upstream> yet?', { ex: ['git cherry -v origin/main   # + = not upstream, - = already there'] }),
+    h('Revert: undo by adding a new commit'),
+    e('git revert <commit>', 'Create a commit that undoes <commit>', { k: 1, ex: ['git revert a1b2c3d', 'git revert HEAD              # undo the last commit', 'git revert --no-edit HEAD    # accept the default message', 'git push                     # safe: history is not rewritten'], n: 'The right undo for anything that is already pushed.' }),
+    e('git revert -m 1 <merge-commit>', 'Undo a merge commit', { k: 1, n: '`-m 1` = keep parent 1 (usually the branch you merged into). Re-merging the same branch later needs the revert reverted first.' }),
+    e('git revert <a>..<b>', 'Undo a range of commits', { ex: ['git revert HEAD~3..HEAD   # three separate revert commits', 'git revert -n HEAD~3..HEAD   # stage the combined revert, commit once'] }),
+    e('git revert --continue | --abort', 'After a conflict'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'remote', ico: '🌐', t: 'Remotes: Fetch, Pull, Push', hue: 'cyan',
+  intro: '`fetch` downloads, `pull` downloads and integrates, `push` uploads. Nothing here changes your working files except `pull`.',
+  items: [
+    h('Manage remotes'),
+    e('git remote -v', 'List remotes and their URLs', { k: 1 }),
+    e('git remote add <name> <url>', 'Add a remote', { k: 1, ex: ['git remote add origin git@github.com:user/repo.git', 'git remote add upstream https://github.com/original/repo.git   # fork workflow'] }),
+    e('git remote set-url <name> <url>', 'Change a remote’s URL', { ex: ['git remote set-url origin git@github.com:user/new-repo.git', 'git remote set-url --push origin <url>   # separate push URL'] }),
+    e('git remote rename <old> <new>', 'Rename a remote'),
+    e('git remote remove <name>', 'Delete a remote', { ex: ['git remote rm upstream'] }),
+    e('git remote show origin', 'Details: branches, tracking, stale refs', {}),
+    e('git remote set-head origin -a', 'Refresh `origin/HEAD` (the remote’s default branch)', {}),
+    h('Fetch: download only'),
+    e('git fetch', 'Download new commits, do not touch my branch', { k: 1, ex: ['git fetch                    # default remote', 'git fetch origin main', 'git fetch --all --prune       # every remote, drop deleted branches', 'git fetch --tags'], n: 'Then inspect with `git log HEAD..origin/main` and merge or rebase when ready.' }),
+    e('git fetch origin pull/<id>/head:pr-<id>', 'Fetch a GitHub pull request into a local branch', { ex: ['git fetch origin pull/123/head:pr-123 && git switch pr-123', '# GitLab: git fetch origin merge-requests/123/head:mr-123'] }),
+    e('git fetch --unshallow', 'Convert a shallow clone into a full one'),
+    h('Pull: fetch + integrate'),
+    e('git pull', 'Fetch and merge the upstream branch into mine', { k: 1, n: 'Equals `git fetch` + `git merge @{u}`. If it complains about “divergent branches”, choose rebase or merge below (or set `pull.rebase`).' }),
+    e('git pull --rebase', 'Fetch and rebase my commits on top', { k: 1, ex: ['git pull --rebase origin main'] }),
+    e('git pull --ff-only', 'Fetch and only fast-forward; refuse otherwise', { k: 1, n: 'The safest pull. If it refuses, decide deliberately: merge or rebase.' }),
+    e('git pull --no-rebase', 'Force a merge-style pull for this one time'),
+    h('Push: upload'),
+    e('git push', 'Upload the current branch to its upstream', { k: 1 }),
+    e('git push -u origin <branch>', 'First push: also set the upstream', { k: 1, ex: ['git push -u origin feature/login', 'git push -u origin HEAD     # current branch, same name'], n: 'With `push.autoSetupRemote true`, plain `git push` does this for you.' }),
+    e('git push origin <local>:<remote>', 'Push to a different branch name', { ex: ['git push origin feature:review/feature', 'git push origin a1b2c3d:refs/heads/hotfix   # push a specific commit'] }),
+    e('git push --force-with-lease', 'Overwrite remote history, but only if nobody else pushed', { k: 1, t: 'danger', ex: ['git push --force-with-lease origin feature', 'git push --force-with-lease --force-if-includes   # even safer (2.30+)'], n: 'Needed after amend or rebase. Old, risky way: `--force` / `-f`.' }),
+    e('git push --force', 'Overwrite remote history, no questions asked', { t: 'danger', n: 'Can erase teammates’ commits. Prefer `--force-with-lease`.' }),
+    e('git push --tags', 'Push all tags', { ex: ['git push origin v1.0.0       # one tag', 'git push --follow-tags       # commits + annotated tags reachable from them'] }),
+    e('git push origin --delete <branch>', 'Delete a remote branch', { k: 1, ex: ['git push origin --delete old-feature'], n: 'Old way: `git push origin :old-feature`.' }),
+    e('git push --all', 'Push all local branches'),
+    e('git push --dry-run', 'Show what would be pushed without doing it', { ex: ['git push -n origin main'] }),
+    e('git push --atomic origin <a> <b>', 'All refs update or none do'),
+    h('Upstream & tracking'),
+    e('git branch -vv', 'Which upstream does each branch track? ahead/behind?', { k: 1 }),
+    e('git ls-remote --heads origin', 'List branches on the remote without cloning', { ex: ['git ls-remote --tags origin', 'git ls-remote origin refs/pull/*/head'] }),
+    e('git remote prune origin', 'Remove stale remote-tracking branches', { ex: ['git remote prune origin --dry-run', 'git fetch --prune     # same, while fetching', 'git config --global fetch.prune true'] }),
+    tip('Fork workflow: `git remote add upstream <original-url>` → `git fetch upstream` → `git rebase upstream/main` (or merge) → `git push --force-with-lease origin my-branch`.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'undo', ico: '⏪', t: 'Undo & Recover', hue: 'red',
+  intro: 'Pick the command by asking: “has it been pushed?” and “do I want to keep the changes?”. 💣 = can destroy uncommitted work.',
+  items: [
+    h('Discard or unstage working changes'),
+    e('git restore <file>', 'Throw away unstaged edits in a file', { k: 1, t: 'danger', v: '2.23+', ex: ['git restore src/app.js', 'git restore .                # everything unstaged', 'git restore -p               # choose hunks'], n: 'Old way: `git checkout -- <file>`. Cannot be undone.' }),
+    e('git restore --staged <file>', 'Unstage, keep the edits', { k: 1, v: '2.23+', n: 'Old way: `git reset HEAD <file>`.' }),
+    e('git restore --source=<commit> <file>', 'Bring back a file from an older commit', { k: 1, ex: ['git restore --source=HEAD~2 src/app.js', 'git restore -s a1b2c3d --staged --worktree src/app.js   # index and disk'], n: 'Old way: `git checkout <commit> -- <file>`.' }),
+    e('git clean -n', 'Dry run: which untracked files would be deleted?', { k: 1, ex: ['git clean -nd     # include folders'] }),
+    e('git clean -fd', 'Delete untracked files and folders', { k: 1, t: 'danger', ex: ['git clean -fd      # untracked files + dirs', 'git clean -fdx     # ALSO ignored files (node_modules, .env, builds)', 'git clean -i       # interactive'], n: 'No undo, not even through reflog. Always run `-n` first.' }),
+    h('Undo commits'),
+    e('git reset --soft HEAD~1', 'Undo last commit, keep changes STAGED', { k: 1, ex: ['git reset --soft HEAD~1     # then recommit differently'] }),
+    e('git reset HEAD~1', 'Undo last commit, keep changes UNSTAGED', { k: 1, n: 'This is `--mixed`, the default mode.', ex: ['git reset HEAD~1', 'git reset a1b2c3d     # move branch to any commit, keep files'] }),
+    e('git reset --hard HEAD~1', 'Undo last commit and DELETE its changes', { k: 1, t: 'danger', ex: ['git reset --hard HEAD~3', 'git reset --hard origin/main     # make local = remote exactly', 'git reset --hard                # discard all uncommitted changes to tracked files'], n: 'Also wipes staged and unstaged edits. Committed work is still recoverable via `git reflog`.' }),
+    { tbl: { head: ['Mode', 'Branch pointer', 'Index (staged)', 'Working files'], rows: [['--soft', 'moves', 'kept', 'kept'], ['--mixed (default)', 'moves', 'reset', 'kept'], ['--hard', 'moves', 'reset', 'reset 💣'], ['--keep', 'moves', 'reset', 'reset, but aborts if it would lose local edits']] } },
+    e('git revert <commit>', 'Undo a commit safely, even if pushed', { k: 1, ex: ['git revert HEAD', 'git revert -m 1 <merge-commit>   # undo a merge'], n: 'Adds a new commit instead of erasing history.' }),
+    e('git commit --amend', 'Fix the last commit', { k: 1, t: 'danger', ex: ['git commit --amend -m "Correct message"', 'git commit --amend --no-edit    # after staging more changes'] }),
+    e('git reset --hard ORIG_HEAD', 'Undo the last merge / pull / rebase / reset', { k: 1, t: 'danger', n: 'Git saves where HEAD was before risky operations in `ORIG_HEAD`.' }),
+    h('Recover lost work'),
+    e('git reflog', 'Journal of where HEAD has been', { k: 1, out: '3f2a1bc HEAD@{0}: reset: moving to HEAD~2\n9c8d7e6 HEAD@{1}: commit: Add search box\n1a2b3c4 HEAD@{2}: checkout: moving from main to feature', ex: ['git reflog show feature          # one branch', 'git reflog --date=relative', 'git reset --hard HEAD@{1}         # go back one step', 'git switch -c rescued 9c8d7e6    # make a branch from a lost commit'], n: 'Entries live about 90 days (30 for unreachable ones). Local only: never pushed.' }),
+    e('git branch <name> <sha>', 'Resurrect a deleted branch', { ex: ['git reflog                # find the last commit of the deleted branch', 'git branch feature-restored 3f2a1bc'] }),
+    e('git fsck --lost-found', 'Find unreachable (dangling) commits and blobs', { ex: ['git fsck --unreachable --no-reflogs | grep commit', 'git show <dangling-sha>'], n: 'Last resort, e.g. for dropped stashes or `git add`-ed files that were never committed.' }),
+    e('git stash', 'Put changes aside temporarily', { ex: ['git stash push -m "wip"', 'git stash pop'] }),
+    tip('Rule: if it’s been pushed, `revert`. If it hasn’t and you want to rewrite it, `reset` or `amend`. If you panic, run `git reflog` first. Almost everything that was committed can be found there.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'stash', ico: '📦', t: 'Stash', hue: 'amber',
+  intro: 'A shelf for uncommitted work, so you can switch context with a clean tree.',
+  items: [
+    e('git stash push -m "msg"', 'Stash tracked changes with a label', { k: 1, ex: ['git stash push -m "half-done search"', 'git stash push -m "only css" -- src/styles/    # specific paths', 'git stash push -p      # choose hunks'], n: 'Old way: `git stash save "msg"` (deprecated). Plain `git stash` = `git stash push`.' }),
+    e('git stash push -u', 'Include untracked files', { k: 1, ex: ['git stash push -u -m "with new files"', 'git stash push -a      # also ignored files'] }),
+    e('git stash list', 'Show all stashes', { k: 1, out: 'stash@{0}: On feature: half-done search\nstash@{1}: WIP on main: 9c8d7e6 Fix typo' }),
+    e('git stash pop', 'Apply the newest stash and delete it', { k: 1, ex: ['git stash pop', 'git stash pop stash@{2}', 'git stash pop --index      # restore the staged/unstaged split'] }),
+    e('git stash apply', 'Apply a stash but keep it in the list', { ex: ['git stash apply stash@{1}'], n: 'If `pop` hits a conflict, the stash is kept.' }),
+    e('git stash show -p', 'Preview a stash as a diff', { ex: ['git stash show -p stash@{1}', 'git stash show --stat', 'git diff stash@{0} HEAD'] }),
+    e('git stash branch <name>', 'Create a branch from a stash and apply it', { ex: ['git stash branch fix-login stash@{0}'], n: 'Handy when the stash no longer applies cleanly to where you are.' }),
+    e('git stash drop', 'Delete one stash', { t: 'danger', ex: ['git stash drop stash@{1}'] }),
+    e('git stash clear', 'Delete ALL stashes', { t: 'danger', n: 'Recoverable only through `git fsck --unreachable` right away.' }),
+    e('git stash --keep-index', 'Stash only the unstaged changes', { ex: ['git stash push --keep-index   # keep staged changes in place, e.g. to test them alone'] }),
+    e('git stash save "msg"', 'Deprecated spelling of `stash push -m`', { t: 'old' }),
+  ],
+});
+
+SECTIONS.push({
+  id: 'tags', ico: '🏷️', t: 'Tags & Releases', hue: 'green',
+  intro: 'Tags permanently name a commit, usually a release.',
+  items: [
+    e('git tag', 'List tags', { k: 1, ex: ['git tag -l "v1.*"', 'git tag --sort=-v:refname     # newest version first', 'git tag --contains a1b2c3d'] }),
+    e('git tag -a <name> -m "msg"', 'Create an annotated tag (author, date, message)', { k: 1, ex: ['git tag -a v1.0.0 -m "Release 1.0.0"', 'git tag -a v0.9.0 a1b2c3d -m "Tag an older commit"', 'git tag -s v1.0.0 -m "Signed release"'], n: 'Use annotated tags for releases. They are full objects and show up in `git describe`.' }),
+    e('git tag <name>', 'Create a lightweight tag (just a name)', { ex: ['git tag build-2026-10-22'] }),
+    e('git show <tag>', 'Inspect a tag and its commit'),
+    e('git push origin <tag>', 'Publish one tag', { k: 1, ex: ['git push origin v1.0.0', 'git push --tags                 # all tags', 'git push --follow-tags          # only annotated tags on pushed commits'], n: 'Tags are not pushed by plain `git push`.' }),
+    e('git tag -d <name>', 'Delete a local tag', { k: 1, ex: ['git tag -d v1.0.0', 'git push origin --delete v1.0.0     # delete on the remote', '# old: git push origin :refs/tags/v1.0.0'] }),
+    e('git tag -f <name> <commit>', 'Move an existing tag', { t: 'danger', n: 'Avoid for tags that were already published.' }),
+    e('git fetch --tags', 'Download tags from the remote', { ex: ['git fetch --tags --force   # also update tags that moved'] }),
+    e('git switch --detach <tag>', 'Check out the code at a tag', { ex: ['git switch --detach v1.0.0', 'git switch -c hotfix-1.0 v1.0.0     # branch from a tag', '# old: git checkout v1.0.0'] }),
+    e('git describe --tags', 'Name the current commit relative to the nearest tag', { ex: ['git describe --tags --abbrev=0    # latest tag only'] }),
+    e('git tag -v <tag>', 'Verify a signed tag'),
+  ],
+});
+
+/* Sections: worktree, submod, debug, patch, maint, rev, plumb, files, oops */
+SECTIONS.push({
+  id: 'worktree', ico: '🌳', t: 'Worktrees', hue: 'green',
+  intro: 'Check out several branches at once in separate folders that share one repository. No stashing, no second clone.',
+  items: [
+    e('git worktree add <path> <branch>', 'Open an existing branch in a new folder', { k: 1, v: '2.5+', ex: ['git worktree add ../hotfix hotfix', 'git worktree add -b review-123 ../review origin/feature   # new branch from a start point', 'git worktree add --detach ../try-old v1.0.0'], n: 'A branch can be checked out in only one worktree at a time.' }),
+    e('git worktree list', 'Show all worktrees', { k: 1, out: '/code/app          3f2a1bc [main]\n/code/hotfix       9c8d7e6 [hotfix]' }),
+    e('git worktree remove <path>', 'Delete a worktree', { k: 1, ex: ['git worktree remove ../hotfix', 'git worktree remove --force ../hotfix    # has uncommitted changes'] }),
+    e('git worktree prune', 'Clean up records of folders you deleted by hand'),
+    e('git worktree move <path> <new-path>', 'Relocate a worktree', {}),
+    e('git worktree lock <path>', 'Protect a worktree on a removable drive from pruning', { ex: ['git worktree lock --reason "on USB" ../usb-tree', 'git worktree unlock ../usb-tree'] }),
+    e('git worktree repair', 'Fix links after moving folders manually', { v: '2.30+' }),
+    tip('Good for: reviewing a PR while your own work stays untouched, running a long test on one branch while you code on another, or comparing two versions side by side.'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'submod', ico: '🧩', t: 'Submodules & Subtree', hue: 'violet',
+  intro: 'Two ways to include another repository inside yours.',
+  items: [
+    h('Submodules: a pointer to an exact commit of another repo'),
+    e('git submodule add <url> [<path>]', 'Add a submodule', { k: 1, ex: ['git submodule add https://github.com/user/lib.git libs/lib', 'git commit -m "Add lib submodule"'], n: 'Creates `.gitmodules` and records the submodule’s commit.' }),
+    e('git submodule update --init --recursive', 'Fetch/checkout submodules after cloning or pulling', { k: 1, ex: ['git clone --recurse-submodules <url>      # do it at clone time', 'git pull --recurse-submodules', 'git config --global submodule.recurse true  # make most commands recurse'] }),
+    e('git submodule update --remote', 'Move submodules to the newest commit of their branch', { ex: ['git submodule update --remote --merge libs/lib', 'git add libs/lib && git commit -m "Bump lib"'] }),
+    e('git submodule status', 'Show submodule commits (`+` = changed, `-` = not initialised)'),
+    e('git submodule foreach "<cmd>"', 'Run a command in each submodule', { ex: ['git submodule foreach "git switch main && git pull"'] }),
+    e('git submodule sync', 'Refresh URLs after `.gitmodules` changed'),
+    e('git diff --submodule', 'Show submodule changes as commit lists', { ex: ['git config --global diff.submodule log'] }),
+    e('git submodule deinit -f <path>', 'Remove a submodule', { t: 'danger', ex: ['git submodule deinit -f libs/lib', 'git rm -f libs/lib', 'rm -rf .git/modules/libs/lib', 'git commit -m "Remove lib submodule"'] }),
+    h('Subtree: copy another repo’s files (and history) into a folder'),
+    e('git subtree add --prefix=<dir> <url> <ref> --squash', 'Import a repo into a subfolder', { ex: ['git subtree add --prefix=vendor/lib https://github.com/user/lib.git main --squash'] }),
+    e('git subtree pull --prefix=<dir> <url> <ref> --squash', 'Update from upstream', { ex: ['git subtree pull --prefix=vendor/lib https://github.com/user/lib.git main --squash'] }),
+    e('git subtree push --prefix=<dir> <url> <branch>', 'Send local changes in that folder back upstream'),
+    e('git subtree split --prefix=<dir> -b <branch>', 'Extract a folder’s history into its own branch'),
+    vs('git submodule', 'git subtree', 'Pick one', 'Submodule: lightweight, exact pinned version, but everyone must remember to init/update. Subtree: code is just in your repo (nothing extra to clone), but your repo grows and syncing back is clunkier.', 'alt'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'debug', ico: '🐛', t: 'Debug & Investigate', hue: 'red',
+  intro: 'Find out when, where and why something broke.',
+  items: [
+    h('bisect: binary search for the commit that broke things'),
+    e('git bisect start', 'Begin a bisect session', { k: 1, ex: ['git bisect start', 'git bisect bad                # current commit is broken', 'git bisect good v1.4.0        # this one worked', '# Git checks out a middle commit; test it, then say:', 'git bisect good    # or: git bisect bad', '# ...repeat ~log2(n) times, Git prints the first bad commit', 'git bisect reset              # go back to where you started'] }),
+    e('git bisect run <script>', 'Automate: the script exits 0 = good, 1–127 = bad', { k: 1, ex: ['git bisect start HEAD v1.4.0', 'git bisect run npm test', 'git bisect run sh -c "make && ./check.sh"'], n: 'Exit code 125 means “can’t test this commit, skip it”.' }),
+    e('git bisect skip | log | visualize | reset', 'Skip an untestable commit, see steps, view in gitk, finish', { k: 1 }),
+    e('git bisect start --term-old=fast --term-new=slow', 'Use your own words', { v: '2.7+', ex: ['git bisect old   # synonyms: good', 'git bisect new   # synonyms: bad'] }),
+    h('Find things in history'),
+    e('git log -S"text" --oneline', 'When did this text appear or vanish?', { k: 1 }),
+    e('git log -L :<func>:<file>', 'How did this function evolve?'),
+    e('git log --diff-filter=D --summary', 'Which commits deleted files?', { ex: ['git log --diff-filter=D --name-only --oneline -- "*.js"', 'git log --diff-filter=A -- path/file   # when was it added?'] }),
+    e('git log --all -- <deleted-file>', 'Find the last commit that had a deleted file', { ex: ['git log --all --oneline -- old.js', 'git show <sha>^:old.js     # view it just before deletion', 'git restore --source=<sha>^ -- old.js   # bring it back'] }),
+    e('git branch --contains <sha>', 'Which branches contain this commit?', { ex: ['git branch -a --contains a1b2c3d', 'git tag --contains a1b2c3d     # which releases?', 'git merge-base --is-ancestor a1b2c3d main && echo yes'] }),
+    e('git blame -L <a>,<b> <file>', 'Who touched these lines?'),
+    e('git grep -n "text" <rev>', 'Search a past version of the code'),
+    e('git diff --check', 'Spot whitespace problems and leftover conflict markers'),
+    h('Diagnose Git itself'),
+    e('GIT_TRACE=1 git <command>', 'Print what Git runs internally', { ex: ['GIT_TRACE=1 git pull', 'GIT_CURL_VERBOSE=1 git push                 # HTTPS problems', 'GIT_SSH_COMMAND="ssh -v" git fetch          # SSH problems', 'GIT_TRACE_PERFORMANCE=1 git status          # why is it slow?'] }),
+    e('git config --show-origin --get <key>', 'Where does this setting come from?', { ex: ['git config --show-origin --get-all user.email'] }),
+    e('git fsck', 'Check repository integrity', { ex: ['git fsck --full'] }),
+    e('git check-ignore -v <path>', 'Why is this file ignored?', { k: 1, ex: ['git check-ignore -v build/app.js', '# prints: .gitignore:3:build/   build/app.js'] }),
+    e('git status --ignored', 'Show ignored files too'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'patch', ico: '📤', t: 'Patches, Archives & Bundles', hue: 'cyan',
+  intro: 'Move changes around without a shared remote: files, emails, zips.',
+  items: [
+    e('git diff > changes.patch', 'Save changes as a plain patch', { ex: ['git diff > changes.patch', 'git diff --staged > staged.patch', 'git diff --binary main > full.patch     # include binary files'] }),
+    e('git apply <patch>', 'Apply a patch to the working tree (no commit)', { k: 1, ex: ['git apply --check changes.patch   # dry run', 'git apply --stat changes.patch', 'git apply --3way changes.patch   # try a three-way merge', 'git apply -R changes.patch       # reverse it'] }),
+    e('git format-patch <range>', 'Export commits as email-style patch files', { k: 1, ex: ['git format-patch -1 HEAD             # last commit', 'git format-patch main..feature -o patches/', 'git format-patch -3 --stdout > series.patch'], n: 'Keeps author, date and message.' }),
+    e('git am <patch>', 'Apply patches from `format-patch` as commits', { k: 1, ex: ['git am patches/*.patch', 'git am --3way < series.patch', 'git am --continue | --skip | --abort'] }),
+    e('git archive -o <file> <rev>', 'Export a snapshot (no .git folder)', { k: 1, ex: ['git archive -o release.zip HEAD', 'git archive --format=tar.gz --prefix=app-1.0/ -o app-1.0.tar.gz v1.0.0', 'git archive HEAD src/ | tar -x -C /tmp/out     # a folder only'], n: 'Files marked `export-ignore` in `.gitattributes` are left out.' }),
+    e('git bundle create <file> --all', 'Pack a whole repo (or range) into one file', { ex: ['git bundle create repo.bundle --all', 'git bundle create update.bundle main ^v1.0     # only new commits', 'git bundle verify repo.bundle', 'git clone repo.bundle my-copy'], n: 'Useful for offline transfer.' }),
+    e('git request-pull <start> <url> [<end>]', 'Generate a pull-request text for emailing', { ex: ['git request-pull v1.0 https://example.com/repo.git main'] }),
+    e('git send-email <patches>', 'Mail patches (used by the Linux kernel workflow)', {}),
+  ],
+});
+
+SECTIONS.push({
+  id: 'maint', ico: '🧹', t: 'Maintenance & Big Repos', hue: 'amber',
+  intro: 'Keep repos fast, shrink them, and handle huge histories.',
+  items: [
+    h('Housekeeping'),
+    e('git gc', 'Compress objects and clean up', { k: 1, ex: ['git gc', 'git gc --prune=now      # also remove all unreachable objects', 'git count-objects -vH   # sizes'], n: 'Git runs this automatically from time to time.' }),
+    e('git maintenance start', 'Schedule background upkeep (prefetch, repack, commit-graph)', { k: 1, v: '2.31+', ex: ['git maintenance start', 'git maintenance run --task=gc', 'git maintenance stop'] }),
+    e('git repack -ad', 'Repack everything into one pack'),
+    e('git reflog expire --expire=now --all && git gc --prune=now', 'Permanently drop all recovery history', { t: 'danger', n: 'After this, “lost” commits can no longer be rescued.' }),
+    e('git config core.fsmonitor true', 'Faster `git status` in big working trees', { ex: ['git config core.untrackedCache true', 'git config feature.manyFiles true     # a bundle of speed-ups'] }),
+    h('Shallow, partial and sparse'),
+    e('git clone --depth <n> <url>', 'Only the last n commits', { k: 1, ex: ['git clone --depth 1 --branch v1.0 <url>', 'git fetch --deepen 50   # fetch 50 more commits of history', 'git fetch --unshallow'] }),
+    e('git clone --filter=blob:none <url>', 'Full history, files downloaded when needed', { n: 'Great for large monorepos and CI.' }),
+    e('git sparse-checkout set <dir>...', 'Check out only some folders', { k: 1, v: '2.25+', ex: ['git clone --filter=blob:none --sparse <url> && cd repo', 'git sparse-checkout set apps/web libs/ui', 'git sparse-checkout list', 'git sparse-checkout disable'] }),
+    h('Big files and removing data'),
+    e('git lfs track "*.psd"', 'Store big binaries outside normal history (Git LFS add-on)', { ex: ['git lfs install', 'git lfs track "*.psd"', 'git add .gitattributes file.psd', 'git lfs ls-files', 'git lfs migrate import --include="*.psd" --everything    # rewrites history 💣'] }),
+    e('git filter-repo --path <file> --invert-paths', 'Delete a file from ALL history', { k: 1, t: 'danger', ex: ['pip install git-filter-repo', 'git filter-repo --invert-paths --path secrets.env', 'git filter-repo --subdirectory-filter packages/ui    # make a folder the new root', 'git filter-repo --replace-text expressions.txt        # scrub strings', 'git remote add origin <url> && git push --force --all'], n: 'Replaces `git filter-branch`. Works on a fresh clone and drops remotes on purpose. Rewrites every hash. **If it was a secret, rotate it first**: it was already exposed.' }),
+    e('git filter-branch --tree-filter "rm -f <file>" HEAD', 'Old way to delete a file from history', { t: 'old', n: 'Slow and fragile. Use `git filter-repo` (or BFG Repo-Cleaner).' }),
+    h('Local-only tricks'),
+    e('git update-index --skip-worktree <file>', 'Ignore local edits to a tracked file', { ex: ['git update-index --skip-worktree config.local.json', 'git update-index --no-skip-worktree config.local.json', 'git ls-files -v | grep "^S"     # list skipped files'], n: '`--assume-unchanged` is a performance hint, not a promise. Prefer `skip-worktree`.' }),
+    e('git update-index --chmod=+x <file>', 'Set the executable bit in the index (Windows)'),
+    e('git config core.longpaths true', 'Allow paths longer than 260 characters (Windows)'),
+  ],
+});
+
+SECTIONS.push({
+  id: 'rev', ico: '📍', t: 'Revision & Range Syntax', hue: 'magenta', noCopy: true,
+  intro: 'Ways to name commits and ranges. Works anywhere a command wants a `<commit>`.',
+  items: [
+    pre('A ── B ── C ── D ── E    ← HEAD\n               \\\n                F ── G\n\nHEAD~2   = C       (go back 2 generations, first parent each time)\nHEAD^    = D       (first parent)  same as HEAD~1\nM^2      = second parent of a merge commit M (the branch that was merged in)\nHEAD~2^2 = parent 2 of the commit two back'),
+    h('Single commits'),
+    e('HEAD', 'The commit you are on', { k: 1, ex: ['git show HEAD', 'git diff HEAD'] }),
+    e('HEAD~<n>  /  HEAD^', 'n commits back along the first parent / the parent', { k: 1, ex: ['git show HEAD~3', 'git reset --soft HEAD~1'] }),
+    e('<rev>^2', 'Second parent of a merge commit', { ex: ['git log --oneline HEAD^2'] }),
+    e('@', 'Short alias for HEAD', { ex: ['git diff @~2'] }),
+    e('<branch>@{<n>}  /  HEAD@{<n>}', 'Where it pointed n moves ago (reflog)', { k: 1, ex: ['git reset --hard HEAD@{2}', 'git show main@{yesterday}', 'git diff main@{"2 weeks ago"}'] }),
+    e('@{-<n>}', 'The nth previously checked-out branch', { ex: ['git switch -     # same as @{-1}', 'git merge @{-1}'] }),
+    e('@{u}  /  @{upstream}  /  @{push}', 'The branch I track / push to', { k: 1, ex: ['git log @{u}..HEAD    # unpushed commits', 'git diff @{u}'] }),
+    e(':/<text>', 'Newest commit whose message contains text', { ex: ['git show :/"fix login"'] }),
+    e('<rev>:<path>', 'A file’s content at that revision', { ex: ['git show HEAD~3:src/app.js', 'git diff HEAD:src/a.js HEAD~5:src/a.js'] }),
+    e('<tag>^{commit}  /  ^{tree}', 'Peel a tag to what it points at', {}),
+    e('a1b2c3d', 'A shortened hash works if unambiguous (usually 7+ chars)', {}),
+    h('Ranges'),
+    e('<a>..<b>', 'Commits reachable from b but not from a', { k: 1, ex: ['git log main..feature      # what feature adds to main', 'git log origin/main..HEAD   # what I have not pushed'] }),
+    e('<a>...<b>', 'Commits in either, but not both (symmetric difference)', { k: 1, ex: ['git log --left-right --oneline main...feature', 'git diff main...feature    # in diff: since the merge base'], n: 'Careful: `..` and `...` mean different things for `log` and `diff`.' }),
+    e('^<rev>  /  --not <rev>', 'Exclude commits reachable from rev', { ex: ['git log feature ^main', 'git log --not --remotes     # commits that exist only locally'] }),
+    e('--all  /  --branches  /  --tags  /  --remotes', 'All refs, or just a kind', { ex: ['git log --all --oneline --graph', 'git log --branches --not --remotes'] }),
+    h('Pathspecs: which files'),
+    e('-- <path>', 'Separator between revisions and file paths', { k: 1, ex: ['git log -- src/', 'git diff main -- package.json', 'git restore -- main     # a FILE named main, not the branch'] }),
+    e(':(exclude)<path>  /  :!<path>', 'Exclude paths', { ex: ['git diff -- . ":(exclude)package-lock.json"', 'git log -- . ":!docs"'] }),
+    e(':(glob)**/*.js', 'Glob magic (** matches folders)', { ex: ['git ls-files ":(glob)src/**/*.test.js"'] }),
+  ],
+});
+
+SECTIONS.push({
+  id: 'plumb', ico: '🔬', t: 'Plumbing & Internals', hue: 'violet',
+  intro: 'The low-level commands behind the everyday ones. Useful for scripts and for understanding how Git stores things.',
+  items: [
+    pre('.git/\n├─ HEAD          which branch/commit you are on  (e.g. "ref: refs/heads/main")\n├─ config        this repo’s settings\n├─ index         the staging area\n├─ objects/      all content: blob (file) · tree (folder) · commit · tag, named by hash\n├─ refs/         heads/ (branches) · tags/ · remotes/\n├─ logs/         the reflog\n└─ hooks/        scripts run on events'),
+    e('git rev-parse <rev>', 'Resolve a name to a full hash, or print repo paths', { k: 1, ex: ['git rev-parse HEAD', 'git rev-parse --short HEAD', 'git rev-parse --show-toplevel     # repo root folder', 'git rev-parse --git-dir', 'git rev-parse --is-inside-work-tree'] }),
+    e('git cat-file -p <sha>', 'Print any object', { k: 1, ex: ['git cat-file -t a1b2c3d      # type: blob|tree|commit|tag', 'git cat-file -p HEAD         # the commit', 'git cat-file -p HEAD^{tree}   # the folder snapshot', 'git cat-file -s a1b2c3d       # size in bytes'] }),
+    e('git ls-tree <rev>', 'List a folder snapshot', { ex: ['git ls-tree HEAD', 'git ls-tree -r --name-only HEAD     # all files at that commit', 'git ls-tree -r -l HEAD | sort -k4 -n | tail   # biggest files'] }),
+    e('git ls-files --stage', 'The index: mode, blob hash, path', { ex: ['git ls-files -s'] }),
+    e('git hash-object <file>', 'Compute (and optionally store) a blob hash', { ex: ['git hash-object README.md', 'git hash-object -w README.md   # write it into the object store'] }),
+    e('git rev-list <range>', 'Machine-friendly commit lists', { ex: ['git rev-list --count HEAD', 'git rev-list --max-parents=0 HEAD    # root commit(s)', 'git rev-list --objects --all | head', 'git rev-list main..feature'] }),
+    e('git for-each-ref', 'Script-friendly list of refs', { ex: ['git for-each-ref --sort=-committerdate refs/heads --format="%(refname:short) %(committerdate:relative)"', 'git for-each-ref --format="%(refname)" refs/tags'] }),
+    e('git show-ref', 'List refs with their hashes', { ex: ['git show-ref --heads', 'git show-ref --tags -d'] }),
+    e('git symbolic-ref HEAD', 'Which branch does HEAD point to?', { ex: ['git symbolic-ref --short HEAD', 'git symbolic-ref refs/remotes/origin/HEAD'], n: 'Fails in detached HEAD, which is handy in scripts.' }),
+    e('git update-ref <ref> <sha>', 'Move or delete a ref directly', { t: 'danger', ex: ['git update-ref refs/heads/main a1b2c3d', 'git update-ref -d refs/heads/old'] }),
+    e('git diff-tree --no-commit-id --name-only -r <sha>', 'Files changed by one commit', { ex: ['git diff-tree --no-commit-id --name-status -r HEAD', 'git show --name-only --format= HEAD     # friendlier'] }),
+    e('git name-rev <sha>', 'Find a branch/tag name for a hash', { ex: ['git name-rev a1b2c3d', 'git describe --contains a1b2c3d'] }),
+    e('git merge-base [--fork-point] <a> <b>', 'Common ancestor', {}),
+    e('git write-tree && git commit-tree', 'Create commits by hand', { ex: ['git commit-tree <tree> -p <parent> -m "msg"'] }),
+    e('git fast-export / fast-import', 'Stream whole repos for migrations', {}),
+    e('git var -l', 'Show all Git variables (identity, editor, pager…)', { ex: ['git var GIT_AUTHOR_IDENT'] }),
+    e('git verify-commit <sha>', 'Check a commit’s signature', { ex: ['git verify-tag v1.0.0'] }),
+  ],
+});
+
+SECTIONS.push({
+  id: 'files', ico: '🪝', t: 'Files, Hooks & Aliases', hue: 'cyan',
+  intro: 'Config files that live in your repo, plus shortcuts worth setting up once.',
+  items: [
+    h('.gitignore patterns'),
+    pre('*.log            any .log file anywhere\nbuild/            a folder named build, anywhere\n/secret.env       only in the repo root\n**/cache          "cache" at any depth\ndocs/**/*.pdf     PDFs anywhere below docs/\n!keep.log         re-include (not possible if a parent folder is ignored)\n# comment         blank lines and # lines are ignored'),
+    e('git check-ignore -v <path>', 'Which rule ignores this file?', { k: 1 }),
+    e('git add -f <file>', 'Force-add an ignored file', {}),
+    e('git config --global core.excludesFile ~/.gitignore_global', 'Personal ignore list for every repo', { ex: ['echo ".DS_Store" >> ~/.gitignore_global', '# per-repo, never committed: .git/info/exclude'] }),
+    e('git ls-files -i -c --exclude-standard', 'Tracked files that are now ignored', { ex: ['git rm --cached <file>   # untrack them'] }),
+    h('.gitattributes'),
+    pre('* text=auto                  normalise line endings automatically\n*.sh text eol=lf             always LF, even on Windows\n*.png binary                 never try to diff/merge\npackage-lock.json -diff      hide noisy diffs\n*.psd filter=lfs diff=lfs merge=lfs -text    Git LFS\ntests/ export-ignore         leave out of `git archive` zips'),
+    h('Hooks: scripts run by Git events'),
+    e('.git/hooks/pre-commit', 'Runs before every commit (lint, tests, secret scan)', { ex: ['#!/bin/sh', 'npm run lint || exit 1', '# make it executable:', 'chmod +x .git/hooks/pre-commit'], n: 'Others: `commit-msg`, `pre-push`, `post-merge`, `prepare-commit-msg`. Exit non-zero to stop the action.' }),
+    e('git config core.hooksPath .githooks', 'Share hooks with the team by committing them', { k: 1, ex: ['git config core.hooksPath .githooks', 'git hook run pre-commit      # run one manually (2.36+)'] }),
+    e('git commit --no-verify', 'Bypass pre-commit and commit-msg hooks', { t: 'danger' }),
+    h('Other useful files'),
+    e('.git-blame-ignore-revs', 'List commits for `git blame` to skip (mass reformatting)', { ex: ['git config blame.ignoreRevsFile .git-blame-ignore-revs'] }),
+    e('.mailmap', 'Merge several author names/emails into one in logs', { ex: ['Ada Lovelace <ada@example.com> <ada@old-company.com>'] }),
+    e('git config commit.template ~/.gitmessage', 'Pre-fill the commit message editor'),
+    h('Aliases worth having'),
+    e('git config --global alias.st "status -sb"', 'git st', { k: 1 }),
+    e('git config --global alias.lg "log --oneline --graph --decorate --all"', 'git lg', { k: 1 }),
+    e('git config --global alias.unstage "restore --staged"', 'git unstage <file>', { k: 1 }),
+    e('git config --global alias.undo "reset --soft HEAD~1"', 'git undo: uncommit but keep staged', { k: 1 }),
+    e('git config --global alias.amend "commit --amend --no-edit"', 'git amend', {}),
+    e('git config --global alias.last "log -1 HEAD --stat"', 'git last', {}),
+    e('git config --global alias.recent "branch --sort=-committerdate -vv"', 'git recent: branches by last activity', {}),
+    e('git config --global alias.cleanup "!git branch --merged main | grep -v \'main\' | xargs -n1 git branch -d"', 'Shell alias (starts with !): delete merged branches', { n: 'A leading `!` runs the rest in your shell, so aliases can chain any commands.' }),
+  ],
+});
+
+SECTIONS.push({
+  id: 'oops', ico: '🆘', t: 'Oops! Emergency Recipes', hue: 'red',
+  intro: 'Find the situation, copy the fix. 💣 = double-check before running.',
+  items: [
+    e('git reset --soft HEAD~1', 'I committed too early: undo the commit, keep my work staged', { k: 1 }),
+    e('git commit --amend -m "new message"', 'Typo in the last commit message (not pushed)', { k: 1 }),
+    e('git add <file> && git commit --amend --no-edit', 'I forgot a file in the last commit', { k: 1 }),
+    e('git switch -c <new-branch>', 'I committed on main by mistake', { k: 1, t: 'danger', ex: ['git switch -c feature          # new branch keeps the commits', 'git switch main', 'git reset --hard origin/main   # 💣 put main back (local commits are safe on feature)'] }),
+    e('git revert <sha>', 'A bad commit is already pushed', { k: 1, ex: ['git revert a1b2c3d', 'git push'] }),
+    e('git reset --hard ORIG_HEAD', 'Undo a merge/pull I just did (not pushed)', { k: 1, t: 'danger', ex: ['git revert -m 1 <merge-sha>   # if the merge is already pushed'] }),
+    e('git reflog', 'I deleted a branch / reset too far: find the old commit', { k: 1, ex: ['git reflog', 'git branch recovered a1b2c3d     # or: git reset --hard HEAD@{1}'] }),
+    e('git restore .', 'Throw away every uncommitted edit', { k: 1, t: 'danger', ex: ['git restore . && git clean -fd     # also remove new untracked files 💣'] }),
+    e('git rebase --abort', 'The rebase/merge/cherry-pick turned into a mess', { k: 1, ex: ['git merge --abort', 'git cherry-pick --abort'] }),
+    e('git switch -c rescue', 'I am in detached HEAD and made commits', { k: 1, ex: ['git switch -c rescue     # keep the commits on a branch'] }),
+    e('git rm --cached <file>', 'I committed a file that should be ignored', { ex: ['git rm --cached .env', 'echo ".env" >> .gitignore', 'git add .gitignore && git commit -m "Stop tracking .env"'], n: 'The file is still in old commits. For secrets see the next recipe.' }),
+    e('git filter-repo --invert-paths --path <file>', 'I committed a secret', { t: 'danger', n: '1) Revoke/rotate the secret immediately (it is already leaked once pushed). 2) Rewrite history with `git filter-repo`. 3) Force-push and ask everyone to re-clone.' }),
+    e('git push --force-with-lease origin <old-sha>:<branch>', 'I force-pushed and destroyed commits', { t: 'danger', ex: ['git reflog show origin/main      # on a machine that fetched before the push', 'git push --force-with-lease origin a1b2c3d:main'], n: 'Anyone who had the old branch can find the hash in their `reflog` or `git log origin/main`.' }),
+    e('git reset HEAD~1 && git add -p', 'Split the last commit into two', { ex: ['git reset HEAD~1', 'git add -p && git commit -m "Part 1"', 'git add -p && git commit -m "Part 2"'] }),
+    e('git reset --soft HEAD~<n> && git commit', 'Squash my last n commits into one', { ex: ['git reset --soft HEAD~3 && git commit -m "Add search"'] }),
+    e('git pull --rebase', '“Divergent branches / need to specify how to reconcile”', { ex: ['git pull --rebase       # replay my commits on top', 'git pull --no-rebase    # merge instead', 'git pull --ff-only      # just fast-forward, else stop', 'git config --global pull.rebase true   # decide once'] }),
+    e('git stash push -u', '“Your local changes would be overwritten by checkout”', { ex: ['git stash push -u -m "wip" && git switch other-branch', 'git stash pop     # when you come back'] }),
+    e('git push -u origin HEAD', '“The current branch has no upstream branch”', { ex: ['git config --global push.autoSetupRemote true   # never see this again'] }),
+    e('git branch -m <old> <new>', 'Rename a branch locally and on the remote', { ex: ['git branch -m old new', 'git push origin -u new', 'git push origin --delete old'] }),
+    e('git config --global --add safe.directory <path>', '“Detected dubious ownership in repository”'),
+    e('git commit --allow-empty -m "ci: retrigger"', 'Re-run CI without changing files'),
+    e('git restore --source=<sha>^ -- <file>', 'I deleted a file earlier and want it back', { ex: ['git log --all --oneline -- <file>     # find the deleting commit', 'git restore --source=a1b2c3d^ -- <file>'] }),
+    e('git fsck --unreachable | grep commit', 'I dropped a stash by accident', { ex: ['git show <sha>     # inspect candidates', 'git stash apply <sha>'] }),
+  ],
+});
+
+</script>
+<script>
+(function () {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const plain = (s) => String(s).replace(/`/g, '').replace(/\*\*/g, '');
+function md(s) {
+  return String(s).split(/(`[^`]+`)/).map((p) =>
+    p.length > 2 && p[0] === '`' && p[p.length - 1] === '`'
+      ? '<code>' + esc(p.slice(1, -1)) + '</code>'
+      : esc(p).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+  ).join('');
+}
+
+/* ---------- command syntax highlighting ---------- */
+const NESTED = new Set(['stash', 'remote', 'submodule', 'worktree', 'bisect', 'config', 'sparse-checkout', 'subtree', 'maintenance', 'reflog', 'bundle', 'lfs', 'hook', 'notes']);
+const TOK = /"[^"]*"|'[^']*'|<[^>\s][^>]*>|\[[^\]]+\]|[^\s<\["']+|\s+|./g;
+function hl(cmd) { return tokenize(cmd).map(([t, cls]) => cls ? '<span class="' + cls + '">' + esc(t) + '</span>' : esc(t)).join(''); }
+function tokenize(cmd) {
+  const toks = String(cmd).match(TOK) || [];
+  const out = []; let idx = 0, sawGit = false, sub = null, sub2 = false;
+  for (const t of toks) {
+    if (/^\s+$/.test(t)) { out.push([t, '']); continue; }
+    let cls = 't-pl';
+    if (t === 'git') { cls = 't-git'; sawGit = true; sub = null; sub2 = false; }
+    else if (t[0] === '"' || t[0] === "'") cls = 't-str';
+    else if (t.length > 2 && (t[0] === '<' || t[0] === '[')) cls = 't-arg';
+    else if (/^(&&|\|\||\||>|>>|<|;)$/.test(t)) { cls = 't-op'; sawGit = false; sub = null; sub2 = false; idx = -1; }
+    else if (/^[A-Z_]+=/.test(t) && idx === 0) { cls = 't-val'; idx = -1; }
+    else if (t[0] === '-' && t.length > 1) {
+      const eq = t.indexOf('=');
+      if (eq > 0) { out.push([t.slice(0, eq + 1), 't-flag'], [t.slice(eq + 1), 't-val']); idx++; continue; }
+      cls = 't-flag';
+    }
+    else if (sawGit && sub === null) { cls = 't-sub'; sub = t; }
+    else if (sawGit && sub !== null && !sub2 && NESTED.has(sub)) { cls = 't-sub'; sub2 = true; }
+    else if (idx === 0 && !sawGit && /^[a-z][\w.-]*$/.test(t)) cls = 't-sub';
+    out.push([t, cls]);
+    idx++;
+  }
+  return out;
+}
+function splitComment(line) {
+  let q = null;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) { if (ch === q) q = null; }
+    else if (ch === '"' || ch === "'") q = ch;
+    else if (ch === '#' && i > 0 && /\s/.test(line[i - 1])) return [line.slice(0, i).replace(/\s+$/, ''), line.slice(i)];
+  }
+  return [line, ''];
+}
+const PROMPT = /^(git|echo|chmod|npm|pip|rm|make|mkdir|cd|tar|cat|touch|code|sh|GIT_[A-Z_]+=)/;
+function exLine(line) {
+  if (/^\s*#/.test(line)) return '<span class="ln"><span class="cm">' + esc(line) + '</span></span>';
+  const [c, cm] = splitComment(line);
+  const isCmd = PROMPT.test(c);
+  return '<span class="ln">' + (isCmd ? '<span class="pr">$</span>' + hl(c) : esc(c)) + (cm ? '  <span class="cm">' + esc(cm) + '</span>' : '') + '</span>';
+}
+function outLines(txt) {
+  return txt.split('\n').map((l) => { const [c, cm] = splitComment(l); return esc(c) + (cm ? '  <span class="cm">' + esc(cm) + '</span>' : ''); }).join('\n');
+}
+
+/* ---------- icons & diagrams ---------- */
+const ICON_COPY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>';
+const ICON_OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const ICON_SEARCH = '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+
+function svgAreas() {
+  const X = [115, 365, 615, 865];
+  const boxes = [['Working tree', 'files you edit'], ['Staging area', 'the “index”: next commit'], ['Local repo', 'commits · HEAD'], ['Remote', 'origin: GitHub, GitLab…']];
+  const defs = '<defs>' +
+    ['f', 'b', 'p'].map((k) => `<marker id="mk${k}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="m${k}"/></marker>`).join('') + '</defs>';
+  const lanes = [
+    { y: 138, from: 0, to: 1, cls: 'fw', mk: 'f', t: 'git add' },
+    { y: 138, from: 1, to: 2, cls: 'fw', mk: 'f', t: 'git commit' },
+    { y: 138, from: 2, to: 3, cls: 'fw', mk: 'f', t: 'git push' },
+    { y: 198, from: 1, to: 0, cls: 'bk', mk: 'b', t: 'git restore <file>' },
+    { y: 198, from: 2, to: 1, cls: 'bk', mk: 'b', t: 'git restore --staged <file>' },
+    { y: 198, from: 3, to: 2, cls: 'pl', mk: 'p', t: 'git fetch' },
+    { y: 258, from: 2, to: 0, cls: 'bk', mk: 'b', t: 'git switch · checkout · merge · rebase · reset --hard' },
+    { y: 318, from: 3, to: 0, cls: 'pl', mk: 'p', t: 'git pull  =  fetch + merge (or rebase)' },
+  ];
+  const stemBottom = [318, 198, 258, 318];
+  let s = `<svg viewBox="0 0 980 352" role="img" aria-label="Diagram: git add moves changes from the working tree to the staging area, git commit to the local repository, git push to the remote; restore, fetch, switch and pull move them back.">` + defs;
+  X.forEach((x, i) => { s += `<line class="stem" x1="${x}" y1="92" x2="${x}" y2="${stemBottom[i]}"/>`; });
+  lanes.forEach((l) => {
+    const dir = l.to > l.from ? 1 : -1;
+    const x1 = X[l.from] + dir * 3, x2 = X[l.to] - dir * 3;
+    s += `<line class="${l.cls}" x1="${x1}" y1="${l.y}" x2="${x2}" y2="${l.y}" marker-end="url(#mk${l.mk})"/>`;
+    s += `<text class="lb lbl" x="${(X[l.from] + X[l.to]) / 2}" y="${l.y - 9}" text-anchor="middle">${esc(l.t)}</text>`;
+  });
+  boxes.forEach(([t, sub], i) => {
+    s += `<rect class="bx" x="${X[i] - 95}" y="12" width="190" height="80" rx="14"/><text class="bt" x="${X[i]}" y="47" text-anchor="middle">${t}</text><text class="bs" x="${X[i]}" y="70" text-anchor="middle">${esc(sub)}</text>`;
+  });
+  return s + '</svg>';
+}
+function svgMR() {
+  const c = (x, y, l, cls = 'cm') => `<circle class="${cls}" cx="${x}" cy="${y}" r="15"/><text x="${x}" y="${y + 5}" text-anchor="middle" style="font:800 14px var(--f-mono)">${l}</text>`;
+  const ln = (x1, y1, x2, y2, cls = 'ln') => `<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  let s = '<svg viewBox="0 0 980 292" role="img" aria-label="Diagram comparing merge, which adds a merge commit, with rebase, which replays commits on top of main.">';
+  // merge
+  s += '<text class="hd" x="30" y="34">MERGE</text><text class="cap" x="30" y="56">keeps history exactly as it happened</text>';
+  s += ln(60, 112, 150, 112) + ln(150, 112, 240, 112) + ln(240, 112, 395, 112, 'lnm') + ln(150, 112, 240, 202) + ln(240, 202, 330, 202) + ln(330, 202, 395, 112, 'lnm');
+  s += c(60, 112, 'A') + c(150, 112, 'B') + c(240, 112, 'C') + c(240, 202, 'D') + c(330, 202, 'E') + c(395, 112, 'M', 'cmn');
+  s += '<text class="tag" x="395" y="82" text-anchor="middle" style="fill:var(--c-magenta)">main</text><text class="tag" x="330" y="238" text-anchor="middle" style="fill:var(--c-cyan)">feature</text>';
+  s += '<text class="cap" x="30" y="268">M is a merge commit with two parents (C and E). Nothing is rewritten.</text>';
+  // rebase
+  const o = 490;
+  s += `<text class="hd" x="${o + 30}" y="34">REBASE</text><text class="cap" x="${o + 30}" y="56">replays your commits on a new base: a straight line</text>`;
+  s += ln(o + 60, 112, o + 150, 112) + ln(o + 150, 112, o + 240, 112) + ln(o + 240, 112, o + 330, 112, 'lnm') + ln(o + 330, 112, o + 420, 112, 'lnm');
+  s += `<line class="cmo" x1="${o + 150}" y1="112" x2="${o + 240}" y2="202"/><line class="cmo" x1="${o + 240}" y1="202" x2="${o + 330}" y2="202"/>`;
+  s += c(o + 60, 112, 'A') + c(o + 150, 112, 'B') + c(o + 240, 112, 'C') + c(o + 330, 112, 'D′', 'cmn') + c(o + 420, 112, 'E′', 'cmn');
+  s += `<circle class="cmo" cx="${o + 240}" cy="202" r="15"/><text x="${o + 240}" y="207" text-anchor="middle" style="font:800 14px var(--f-mono);fill:var(--fg3)">D</text><circle class="cmo" cx="${o + 330}" cy="202" r="15"/><text x="${o + 330}" y="207" text-anchor="middle" style="font:800 14px var(--f-mono);fill:var(--fg3)">E</text>`;
+  s += `<text class="tag" x="${o + 420}" y="82" text-anchor="middle" style="fill:var(--c-cyan)">feature</text><text class="tag" x="${o + 240}" y="82" text-anchor="middle" style="fill:var(--c-magenta)">main</text>`;
+  s += `<text class="cap" x="${o + 30}" y="268">D and E are copied as new commits D′ E′ (new hashes). The old ones are dropped.</text>`;
+  return s + '</svg>';
+}
+const SVGS = { areas: svgAreas, mergerebase: svgMR };
+
+/* ---------- main page rendering ---------- */
+const HUES = ['cyan', 'green', 'violet', 'amber', 'magenta', 'red', 'orange'];
+const VD = { new: ['✅ USE THE NEW ONE', 'new'], both: ['🤝 BOTH ARE FINE', 'both'], alt: ['🔀 DIFFERENT TOOLS', 'alt'], old: ['⚠️ LEGACY', 'old'] };
+const isEntry = (it) => !!(it.c || it.vs);
+const countOf = (sec) => sec.items.filter(isEntry).length;
+
+function hay(it) {
+  return [it.c, it.d, it.n, it.o, it.w, it.g, it.v, ...(it.ex || []), it.out].filter(Boolean).join(' ').toLowerCase();
+}
+function copyBtn(txt, cls = '') {
+  return `<button class="copy ${cls}" type="button" data-copy="${esc(txt)}" aria-label="Copy command" title="Copy">${ICON_COPY}</button>`;
+}
+function entryHTML(it) {
+  const pills = (it.t === 'new' ? '<span class="pill new">NEW</span>' : it.t === 'old' ? '<span class="pill old">OLD</span>' : it.t === 'danger' ? '<span class="pill danger">💣 DESTRUCTIVE</span>' : '') +
+    (it.v ? `<span class="pill ver">git ${esc(it.v)}</span>` : '');
+  const more = [];
+  if (it.ex && it.ex.length) more.push(`<pre class="ex">${it.ex.map(exLine).join('')}</pre>`);
+  if (it.out) more.push(`<pre class="out">${outLines(it.out)}</pre>`);
+  if (it.n) more.push(`<p class="note"><span>${md(it.n)}</span></p>`);
+  return `<article class="ent" data-kind="ent" data-k="${it.k ? 1 : 0}" data-t="${it.t || ''}" data-h="${esc(hay(it))}">` +
+    `<div class="cmdbox"><code class="cmd">${hl(it.c)}</code>${copyBtn(it.c)}</div>` +
+    `<p class="ent-d">${it.k ? '<span class="star" title="Essential" aria-label="Essential">★</span>' : ''}${md(it.d)}${pills}</p>` +
+    (more.length ? `<div class="more">${more.join('')}</div>` : '') + '</article>';
+}
+function vsHTML(it) {
+  const [label, cls] = VD[it.vd] || VD.new;
+  const neutral = it.vd === 'alt' || it.vd === 'both';
+  const l1 = neutral ? (it.vd === 'alt' ? 'OPTION A' : 'CLASSIC') : 'OLD · STILL WORKS';
+  const l2 = neutral ? (it.vd === 'alt' ? 'OPTION B' : 'NEWER') : 'NEW · PREFER THIS';
+  const firstNew = it.n.split(/\s{2,}|\s\|\s|\s·\s/)[0];
+  return `<article class="ent-vs vs vs-${neutral && it.vd === 'alt' ? 'alt' : 'x'}" data-kind="vs" data-k="${it.k ? 1 : 0}" data-vd="${it.vd}" data-h="${esc(hay(it))}">` +
+    `<div class="vs-top"><span class="vs-d">${esc(it.d)}</span><span class="vd ${cls}">${label}</span></div>` +
+    `<div class="vs-grid"><div class="vs-side vs-old"><span class="lb">${l1}</span><code>${hl(it.o)}</code></div><span class="vs-arrow" aria-hidden="true">→</span>` +
+    `<div class="vs-side vs-new"><span class="lb">${l2}${copyBtn(firstNew, 's')}</span><code>${hl(it.n)}</code></div></div>` +
+    `<p class="vs-w">${md(it.w)}</p></article>`;
+}
+function itemHTML(it) {
+  if (it.h) return `<div class="sub" data-kind="h">${esc(it.h)}</div>`;
+  if (it.vs) return vsHTML(it);
+  if (it.c) return entryHTML(it);
+  if (it.tip) return `<div class="tip" data-kind="x"><span>${md(it.tip)}</span></div>`;
+  if (it.pre) return `<pre class="prebox" data-kind="x">${esc(it.pre)}</pre>`;
+  if (it.svg) return `<div class="diagram" data-kind="x">${SVGS[it.svg]()}</div>`;
+  if (it.tbl) return `<div class="tblwrap" data-kind="x"><table><thead><tr>${it.tbl.head.map((x) => `<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${it.tbl.rows.map((r) => `<tr>${r.map((x) => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return '';
+}
+function sectionHTML(sec, i) {
+  const glossary = sec.items.filter((x) => x.g);
+  let body = '', gridOpen = false;
+  sec.items.forEach((it) => {
+    if (it.g) {
+      if (!gridOpen) { body += '<div class="g-grid" data-kind="g">'; gridOpen = true; }
+      body += `<div class="g-i" data-h="${esc((it.g + ' ' + it.d).toLowerCase())}"><b>${esc(it.g)}</b><span class="g-d">${md(it.d)}</span></div>`;
+      return;
+    }
+    if (gridOpen) { body += '</div>'; gridOpen = false; }
+    body += itemHTML(it);
+  });
+  if (gridOpen) body += '</div>';
+  const n = countOf(sec);
+  return `<section class="sec hue-${sec.hue}" id="s-${sec.id}" data-sec="${sec.id}" data-collapsed="false">` +
+    `<header class="sec-h"><div class="sec-ico" aria-hidden="true">${sec.ico}</div><div class="sec-t"><h2><span>${esc(sec.t)}</span></h2><p>${md(sec.intro)}</p></div>` +
+    `<div class="sec-acts">${sec.poster === false ? '' : `<button class="btn" type="button" data-img="${sec.id}" title="Save this section as an image"><span aria-hidden="true">🖼️</span><span class="tx">Image</span></button>`}` +
+    `<button class="btn" type="button" data-fold="${sec.id}" aria-expanded="true" aria-label="Collapse ${esc(sec.t)}"><span class="twist" aria-hidden="true">▾</span></button></div></header>` +
+    `<div class="sec-b">${body}</div></section>`;
+}
+
+const state = { q: '', mode: 'all', dense: false };
+function buildPage() {
+  const main = $('#main');
+  main.innerHTML = SECTIONS.map(sectionHTML).join('') + '<div class="empty" id="empty" hidden>No command matches that. Try fewer words, or clear the filters.</div>';
+  const nav = SECTIONS.map((s) => `<a href="#s-${s.id}" data-nav="${s.id}" class="hue-${s.hue}"><span aria-hidden="true">${s.ico}</span>${esc(s.t)}<span class="n">${countOf(s) || ''}</span></a>`).join('');
+  $('#side').innerHTML = '<h2>Sections</h2>' + nav;
+  $('#mobnav').innerHTML = SECTIONS.map((s) => `<a href="#s-${s.id}" data-nav="${s.id}">${s.ico} ${esc(s.t)}</a>`).join('');
+  const total = SECTIONS.reduce((a, s) => a + countOf(s), 0);
+  const keys = SECTIONS.reduce((a, s) => a + s.items.filter((x) => isEntry(x) && x.k).length, 0);
+  const pairs = SECTIONS.reduce((a, s) => a + s.items.filter((x) => x.vs).length, 0);
+  $('#stats').innerHTML = `<span class="stat"><b>${total}</b> commands &amp; recipes</span><span class="stat"><b>${pairs}</b> old ↔ new pairs</span><span class="stat"><b>${keys}</b> essentials ★</span><span class="stat"><b>${SECTIONS.length}</b> sections</span>`;
+}
+
+function applyFilters() {
+  const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+  const active = words.length > 0 || state.mode !== 'all';
+  let total = 0;
+  $$('.sec').forEach((secEl) => {
+    let visible = 0, lastH = null, lastHHas = false;
+    const flushH = () => { if (lastH) lastH.hidden = !lastHHas; };
+    Array.from($('.sec-b', secEl).children).forEach((el) => {
+      const kind = el.dataset.kind;
+      if (kind === 'h') { flushH(); lastH = el; lastHHas = false; el.hidden = false; return; }
+      let show = true;
+      if (kind === 'g') {
+        let any = false;
+        $$('.g-i', el).forEach((gi) => { const ok = words.every((w) => gi.dataset.h.includes(w)) && state.mode === 'all'; gi.hidden = !ok; any = any || ok; });
+        el.hidden = !any; if (any) { visible++; lastHHas = true; }
+        return;
+      }
+      if (kind === 'x') { el.hidden = active; if (!active) lastHHas = true; return; }
+      const h = el.dataset.h || '';
+      show = words.every((w) => h.includes(w));
+      if (show && state.mode !== 'all') {
+        if (state.mode === 'key') show = el.dataset.k === '1';
+        else if (state.mode === 'new') show = el.dataset.t === 'new' || kind === 'vs' && el.dataset.vd === 'new';
+        else if (state.mode === 'old') show = el.dataset.t === 'old' || kind === 'vs';
+        else if (state.mode === 'danger') show = el.dataset.t === 'danger';
+      }
+      el.hidden = !show;
+      if (show) { visible++; total++; lastHHas = true; }
+    });
+    flushH();
+    secEl.hidden = active && visible === 0;
+    if (active && visible > 0 && secEl.dataset.collapsed === 'true') setFold(secEl, false);
+    const id = secEl.dataset.sec;
+    $$(`[data-nav="${id}"]`).forEach((a) => a.classList.toggle('dim', active && visible === 0));
+  });
+  $('#empty').hidden = !(active && total === 0);
+  const c = $('#count');
+  c.textContent = active ? `${total} match${total === 1 ? '' : 'es'}` : '';
+  document.body.classList.toggle('dense', state.dense);
+}
+
+function setFold(secEl, fold) {
+  secEl.dataset.collapsed = fold ? 'true' : 'false';
+  const b = $('[data-fold]', secEl);
+  if (b) b.setAttribute('aria-expanded', fold ? 'false' : 'true');
+}
+
+/* ---------- toast & copy ---------- */
+let toastT;
+function toast(msg) {
+  let t = $('#toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2200);
+}
+async function copyText(txt, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) {
+    try {
+      const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove();
+    } catch (e2) { ok = false; }
+  }
+  if (ok) {
+    btn.classList.add('ok'); btn.innerHTML = ICON_OK; toast('Copied: ' + (txt.length > 60 ? txt.slice(0, 57) + '…' : txt));
+    setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = ICON_COPY; }, 1300);
+  } else toast('Copy is blocked here. Select the command text instead.');
+}
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const effTheme = () => root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+function paintThemeBtn() {
+  const dark = effTheme() === 'dark';
+  const b = $('#themeBtn');
+  b.innerHTML = dark ? '<span aria-hidden="true">☀️</span><span class="tx">Light mode</span>' : '<span aria-hidden="true">🌙</span><span class="tx">Dark mode</span>';
+  b.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+}
+function toggleTheme() {
+  const next = effTheme() === 'dark' ? 'light' : 'dark';
+  root.dataset.theme = next;
+  try { localStorage.setItem('gcs-theme', next); } catch (e) { /* ignore */ }
+  paintThemeBtn();
+}
+
+/* ---------- poster (image export) ---------- */
+const pstate = { scope: 'overview', theme: null, quality: 3, ex: true, token: 0, spec: null, opener: null };
+/* Canvas poster engine: lays out the compact sheet and draws it at any scale.
+   Runs inside the app IIFE (uses SECTIONS, tokenize, splitComment, plain, isEntry, countOf, esc, $). */
+const PF = {
+  body: '"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  head: '"Bricolage Grotesque", "Manrope", system-ui, sans-serif',
+  mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
+  emoji: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+};
+const mc = document.createElement('canvas').getContext('2d');
+const fnt = (w, px, fam) => `${w} ${px}px ${fam}`;
+const textW = (f, t) => { mc.font = f; return mc.measureText(t).width; };
+
+function readPal(theme) {
+  const probe = document.createElement('div');
+  probe.className = 't-' + theme;
+  probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden';
+  document.body.appendChild(probe);
+  const get = (el, k) => getComputedStyle(el).getPropertyValue(k).trim();
+  const p = { theme };
+  ['bg', 'surface', 'surface2', 'code', 'line', 'outline', 'fg', 'fg2', 'fg3'].forEach((k) => { p[k] = get(probe, '--' + k); });
+  ['orange', 'cyan', 'green', 'violet', 'amber', 'magenta', 'red'].forEach((k) => { p[k] = get(probe, '--c-' + k); });
+  p.hue = {};
+  HUES.forEach((h) => {
+    const el = document.createElement('div'); el.className = 'hue-' + h; probe.appendChild(el);
+    p.hue[h] = { ac: get(el, '--ac'), t: get(el, '--ac-t'), line: get(el, '--ac-line'), glow: get(el, '--ac-glow') };
+  });
+  probe.remove();
+  p.cls = { 't-git': p.orange, 't-sub': p.cyan, 't-flag': p.amber, 't-arg': p.magenta, 't-str': p.green, 't-op': p.fg3, 't-pl': p.fg, 't-val': p.magenta, '': p.fg };
+  return p;
+}
+function cmdRuns(cmd, p, forceColor) {
+  return tokenize(cmd).map(([t, cls]) => [t, forceColor || p.cls[cls] || p.fg]);
+}
+function groupRuns(seg) {
+  const out = [];
+  for (const [x, c] of seg) { const l = out[out.length - 1]; if (l && l[1] === c) l[0] += x; else out.push([x, c]); }
+  return out;
+}
+function wrapMono(runs, maxW, f) {
+  mc.font = f;
+  const cw = mc.measureText('0').width;
+  const maxCh = Math.max(6, Math.floor(maxW / cw));
+  const ch = [];
+  for (const [t, c] of runs) for (const x of t) ch.push([x, c]);
+  const lines = []; let i = 0;
+  while (i < ch.length) {
+    let end = Math.min(ch.length, i + maxCh);
+    if (end < ch.length) {
+      let q = end; const floor = i + Math.floor(maxCh * 0.4);
+      while (q > floor && !' /-='.includes(ch[q - 1][0])) q--;
+      if (q > floor) end = q;
+    }
+    const seg = ch.slice(i, end); i = end;
+    while (seg.length > 1 && seg[seg.length - 1][0] === ' ') seg.pop();
+    while (i < ch.length && ch[i][0] === ' ') i++;
+    lines.push(groupRuns(seg));
+  }
+  if (!lines.length) lines.push([]);
+  return lines;
+}
+function wrapText(text, maxW, f) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = []; let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (textW(f, test) <= maxW || !cur) cur = test; else { lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+function rr(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function drawRuns(ctx, runs, x, y) { let cx = x; for (const [t, c] of runs) { ctx.fillStyle = c; ctx.fillText(t, cx, y); cx += ctx.measureText(t).width; } return cx; }
+function dashedLine(ctx, x1, y1, x2, color) { ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.stroke(); ctx.restore(); }
+const noEmoji = (s) => String(s).replace(/💣/g, '(!)');
+
+/* ----- blocks: {h, draw(ctx, x, y, first)} ----- */
+const F_CMD = fnt(700, 15.5, PF.mono), F_OLD = fnt(700, 14.5, PF.mono), F_DESC = fnt(500, 14.5, PF.body), F_EX = fnt(500, 12.5, PF.mono);
+function bSub(it, L) {
+  const f = fnt(800, 13, PF.mono), txt = it.h.toUpperCase();
+  return { h: 36, sub: true, draw(ctx, x, y) { ctx.font = f; ctx.fillStyle = L.ac; let cx = x; for (const c of txt) { ctx.fillText(c, cx, y + 26); cx += ctx.measureText(c).width + 1.3; } } };
+}
+function bEnt(it, L) {
+  const runs = cmdRuns(it.c, L.p);
+  if (it.t === 'new') runs.push(['  NEW', L.p.green]);
+  else if (it.t === 'old') runs.push(['  OLD', L.p.amber]);
+  else if (it.t === 'danger') runs.push(['  (!)', L.p.red]);
+  if (it.v) runs.push(['  ' + it.v, L.p.cyan]);
+  const cl = wrapMono(runs, L.w, F_CMD);
+  const dl = wrapText(plain(it.d), L.w, F_DESC);
+  let ex = [];
+  if (L.withEx && it.ex) {
+    it.ex.filter((l) => !/^\s*#/.test(l)).slice(0, 2).forEach((l) => {
+      const [c] = splitComment(l);
+      ex = ex.concat(wrapMono([[noEmoji(c), L.p.fg2]], L.w - 20, F_EX));
+    });
+  }
+  const exH = ex.length ? ex.length * 18 + 12 : 0;
+  const h = 6 + cl.length * 22 + 2 + dl.length * 20 + (exH ? 6 + exH : 0) + 7;
+  return {
+    h, draw(ctx, x, y, first) {
+      if (!first) dashedLine(ctx, x, y + 0.5, x + L.w, L.p.line);
+      let yy = y + 6;
+      ctx.font = F_CMD; ctx.textBaseline = 'alphabetic';
+      cl.forEach((ln, i) => drawRuns(ctx, ln, x, yy + i * 22 + 16));
+      yy += cl.length * 22 + 2;
+      ctx.font = F_DESC; ctx.fillStyle = L.p.fg2;
+      dl.forEach((t, i) => ctx.fillText(t, x, yy + i * 20 + 14));
+      yy += dl.length * 20;
+      if (exH) {
+        yy += 6; ctx.fillStyle = L.p.code; rr(ctx, x, yy, L.w, exH, 7); ctx.fill();
+        ctx.font = F_EX; ex.forEach((ln, i) => drawRuns(ctx, ln, x + 10, yy + 6 + i * 18 + 13));
+      }
+    },
+  };
+}
+function bVs(it, L) {
+  const strike = it.vd === 'new';
+  const ol = wrapMono(cmdRuns(it.o, L.p, L.p.fg3), L.w, F_OLD);
+  const nl = wrapMono(cmdRuns(it.n, L.p), L.w, F_CMD);
+  const sep = it.vd === 'new' ? '↓ use' : it.vd === 'both' ? 'or' : 'vs';
+  const first = (plain(it.w).match(/^.*?[.!?](\s|$)/) || [plain(it.w)])[0].trim();
+  const dl = wrapText(plain(it.d) + (L.detailed ? ' · ' + first : ''), L.w, F_DESC);
+  const h = 8 + ol.length * 20 + 18 + nl.length * 22 + 3 + dl.length * 20 + 9;
+  return {
+    h, draw(ctx, x, y, firstB) {
+      if (!firstB) dashedLine(ctx, x, y + 0.5, x + L.w, L.p.line);
+      let yy = y + 8; ctx.textBaseline = 'alphabetic';
+      ctx.font = F_OLD;
+      ol.forEach((ln, i) => {
+        const end = drawRuns(ctx, ln, x, yy + i * 20 + 15);
+        if (strike) { ctx.strokeStyle = L.p.fg3; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x, yy + i * 20 + 10); ctx.lineTo(end, yy + i * 20 + 10); ctx.stroke(); }
+      });
+      yy += ol.length * 20;
+      ctx.font = fnt(700, 12.5, PF.mono); ctx.fillStyle = L.p.fg3; ctx.fillText(sep, x, yy + 13); yy += 18;
+      ctx.font = F_CMD; nl.forEach((ln, i) => drawRuns(ctx, ln, x, yy + i * 22 + 16));
+      yy += nl.length * 22 + 3;
+      ctx.font = F_DESC; ctx.fillStyle = L.p.fg2; dl.forEach((t, i) => ctx.fillText(t, x, yy + i * 20 + 14));
+    },
+  };
+}
+function bTip(it, L) {
+  const f = fnt(500, 14, PF.body), lines = wrapText(plain(it.tip), L.w - 26, f);
+  const h = 12 + lines.length * 19 + 16 + 6;
+  return { h, draw(ctx, x, y) {
+    ctx.save(); ctx.fillStyle = L.hue.t; rr(ctx, x, y + 10, L.w, h - 16, 10); ctx.fill();
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = L.ac; ctx.lineWidth = 1.8; ctx.stroke(); ctx.restore();
+    ctx.font = f; ctx.fillStyle = L.p.fg; lines.forEach((t, i) => ctx.fillText(t, x + 13, y + 10 + 8 + i * 19 + 14));
+  } };
+}
+function bPre(it, L) {
+  const lines = []; it.pre.split('\n').forEach((l) => wrapMono([[noEmoji(l), L.p.fg]], L.w - 24, F_EX).forEach((x) => lines.push(x)));
+  const h = 10 + lines.length * 18 + 18 + 6;
+  return { h, draw(ctx, x, y) {
+    ctx.fillStyle = L.p.code; rr(ctx, x, y + 10, L.w, h - 16, 8); ctx.fill(); ctx.strokeStyle = L.p.line; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = F_EX; lines.forEach((ln, i) => drawRuns(ctx, ln, x + 12, y + 10 + 9 + i * 18 + 13));
+  } };
+}
+function bTbl(it, L) {
+  const n = it.tbl.head.length, cw = L.w / n, h = 10 + (it.tbl.rows.length + 1) * 28 + 6;
+  return { h, draw(ctx, x, y) {
+    const y0 = y + 10; ctx.font = fnt(700, 12.5, PF.mono);
+    ctx.fillStyle = L.p.surface2; ctx.fillRect(x, y0, L.w, 28);
+    it.tbl.head.forEach((t, i) => { ctx.fillStyle = L.p.fg2; ctx.fillText(t.toUpperCase(), x + i * cw + 8, y0 + 18); });
+    it.tbl.rows.forEach((r, ri) => {
+      const ry = y0 + 28 * (ri + 1);
+      ctx.strokeStyle = L.p.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, ry); ctx.lineTo(x + L.w, ry); ctx.stroke();
+      r.forEach((t, i) => { ctx.font = i === 0 ? fnt(700, 12.5, PF.mono) : fnt(500, 12.5, PF.body); ctx.fillStyle = i === 0 ? L.ac : L.p.fg; ctx.fillText(noEmoji(textClip(t, cw - 14, ctx.font)), x + i * cw + 8, ry + 18); });
+    });
+    ctx.strokeStyle = L.p.line; ctx.strokeRect(x, y0, L.w, 28 * (it.tbl.rows.length + 1));
+  } };
+}
+function textClip(t, w, f) { if (textW(f, t) <= w) return t; while (t.length > 3 && textW(f, t + '…') > w) t = t.slice(0, -1); return t + '…'; }
+
+function makeBlock(it, L) {
+  if (it.h) return bSub(it, L);
+  if (it.vs) return bVs(it, L);
+  if (it.c) return bEnt(it, L);
+  if (L.detailed && it.tip) return bTip(it, L);
+  if (L.detailed && it.pre) return bPre(it, L);
+  if (L.detailed && it.tbl) return bTbl(it, L);
+  return null;
+}
+function partition(heights, k) {
+  let lo = Math.max(...heights, 1), hi = heights.reduce((a, b) => a + b, 0);
+  const fits = (lim) => { let n = 1, cur = 0; for (const h of heights) { if (cur + h > lim) { n++; cur = h; } else cur += h; } return n <= k; };
+  while (hi - lo > 2) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
+  const groups = [[]]; let cur = 0;
+  heights.forEach((h, i) => { if (cur + h > hi && groups[groups.length - 1].length && groups.length < k) { groups.push([]); cur = 0; } groups[groups.length - 1].push(i); cur += h; });
+  while (groups.length < k) groups.push([]);
+  return groups;
+}
+/* sub-heading blocks stay glued to the block that follows them */
+function glue(blocks) {
+  const units = []; let pending = null;
+  blocks.forEach((b) => {
+    if (b.sub) { pending = b; return; }
+    if (pending) { const a = pending; units.push({ h: a.h + b.h, parts: [a, b] }); pending = null; } else units.push({ h: b.h, parts: [b] });
+  });
+  return units;
+}
+function drawUnits(ops, units, x, y, firstFlag = true) {
+  let yy = y, first = firstFlag;
+  units.forEach((u) => u.parts.forEach((b) => { const cy = yy, isFirst = first; ops.push((ctx) => b.draw(ctx, x, cy, isFirst)); first = !!b.sub; yy += b.h; }));
+  return yy - y;
+}
+function cardDecor(ctx, p, hue, x, y, w, h) {
+  ctx.save();
+  if (p.theme === 'dark') {
+    ctx.shadowColor = hue.glow; ctx.shadowBlur = 26; ctx.fillStyle = p.surface; rr(ctx, x, y, w, h, 16); ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = hue.ac; ctx.globalAlpha = 0.55; ctx.lineWidth = 1.6; ctx.stroke();
+  } else {
+    ctx.fillStyle = hue.ac; rr(ctx, x + 6, y + 6, w, h, 16); ctx.fill();
+    ctx.fillStyle = p.surface; rr(ctx, x, y, w, h, 16); ctx.fill(); ctx.strokeStyle = p.outline; ctx.lineWidth = 2.2; ctx.stroke();
+  }
+  ctx.restore();
+}
+function cardHead(ctx, p, sec, hue, x, y, w, small) {
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = fnt(400, 26, PF.emoji); ctx.fillStyle = p.fg; ctx.fillText(sec.ico, x, y + 28);
+  ctx.font = fnt(800, 26, PF.head); ctx.fillText(sec.t, x + 42, y + 28);
+  if (small) { ctx.font = fnt(600, 14, PF.body); ctx.fillStyle = p.fg3; ctx.textAlign = 'right'; ctx.fillText(small, x + w, y + 27); ctx.textAlign = 'left'; }
+  ctx.fillStyle = hue.ac; ctx.fillRect(x, y + 40, w, 3);
+}
+
+function compose(scope, theme, opts) {
+  const p = readPal(theme);
+  const overview = scope === 'overview';
+  const secDef = overview ? null : SECTIONS.find((s) => s.id === scope);
+  const W = overview ? 2400 : 1500, P = 56, ops = [];
+  ops.push((ctx) => { ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, 1e5); });
+  /* header */
+  const legendW = 330, availW = W - 2 * P - legendW - 40;
+  const totalKeys = SECTIONS.filter((s) => s.poster !== false).reduce((a, s) => a + s.items.filter((x) => isEntry(x) && x.k).length, 0);
+  const sub = overview ? `The essentials on one page · ${totalKeys} commands · old ↔ new equivalents included` : plain(secDef.intro);
+  const word = overview ? 'CHEAT SHEET' : secDef.t.toUpperCase();
+  let tpx = 64; while (tpx > 36 && textW(fnt(800, tpx, PF.head), 'GIT ' + word) > availW) tpx -= 2;
+  const subLines = wrapText(sub, availW, fnt(500, 20, PF.body));
+  const headH = Math.max(tpx + 14 + subLines.length * 28, 4 * 24 + 10);
+  const hy = P;
+  ops.push((ctx) => {
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = fnt(800, tpx, PF.head); ctx.fillStyle = p.fg; ctx.fillText('GIT ', P, hy + tpx * 0.92);
+    const gw = ctx.measureText('GIT ').width; ctx.fillStyle = p.orange; ctx.fillText(word, P + gw, hy + tpx * 0.92);
+    ctx.font = fnt(500, 20, PF.body); ctx.fillStyle = p.fg2; subLines.forEach((t, i) => ctx.fillText(t, P, hy + tpx + 14 + 20 + i * 28 - 6));
+    const lg = [['NEW', p.green, ' modern command'], ['OLD', p.amber, ' legacy, still works'], ['(!)', p.red, ' can destroy work'], ['2.23+', p.cyan, ' needs this Git version']];
+    lg.forEach(([a, c, b], i) => {
+      const y = hy + 16 + i * 24; ctx.font = fnt(600, 15, PF.body); const bw = ctx.measureText(b).width;
+      ctx.font = fnt(800, 15, PF.mono); const aw = ctx.measureText(a).width;
+      const x0 = W - P - aw - bw; ctx.fillStyle = c; ctx.fillText(a, x0, y); ctx.font = fnt(600, 15, PF.body); ctx.fillStyle = p.fg2; ctx.fillText(b, x0 + aw, y);
+    });
+    ctx.fillStyle = p.fg; ctx.fillRect(P, hy + headH + 18, W - 2 * P, 4);
+  });
+  let y = hy + headH + 18 + 4 + 30;
+  /* body */
+  if (overview) {
+    const COLS = 5, GAP = 26, colW = (W - 2 * P - GAP * (COLS - 1)) / COLS, inner = colW - 44;
+    const cards = [];
+    SECTIONS.filter((s) => s.poster !== false).forEach((s) => {
+      const items = s.items.filter((x) => isEntry(x) && x.k);
+      if (!items.length) return;
+      const hue = p.hue[s.hue], L = { p, w: inner, ac: hue.ac, hue, withEx: false, detailed: false };
+      const units = glue(items.map((it) => makeBlock(it, L)).filter(Boolean));
+      const bodyH = units.reduce((a, u) => a + u.h, 0);
+      cards.push({ s, hue, units, h: 18 + 46 + 6 + bodyH + 12 });
+    });
+    const groups = partition(cards.map((c) => c.h + GAP), COLS);
+    let maxY = y;
+    groups.forEach((g, ci) => {
+      let cy = y; const x = P + ci * (colW + GAP);
+      g.forEach((i) => {
+        const c = cards[i], top = cy;
+        ops.push((ctx) => { cardDecor(ctx, p, c.hue, x, top, colW, c.h); cardHead(ctx, p, c.s, c.hue, x + 22, top + 18, colW - 44); });
+        drawUnits(ops, c.units, x + 22, top + 18 + 46 + 6);
+        cy += c.h + GAP;
+      });
+      maxY = Math.max(maxY, cy - GAP);
+    });
+    y = maxY;
+  } else {
+    const hue = p.hue[secDef.hue], cardW = W - 2 * P, inner = cardW - 44, COLS = 2, CG = 40, colW = (inner - CG) / COLS;
+    const L = { p, w: colW, ac: hue.ac, hue, withEx: !!opts.ex, detailed: true };
+    const blocks = secDef.items.filter((it) => !it.svg && !it.g).map((it) => makeBlock(it, L)).filter(Boolean);
+    const units = glue(blocks);
+    const groups = partition(units.map((u) => u.h), COLS);
+    const colH = groups.map((g) => g.reduce((a, i) => a + units[i].h, 0));
+    const h = 18 + 46 + 6 + Math.max(...colH) + 26;
+    const top = y;
+    ops.push((ctx) => { cardDecor(ctx, p, hue, P, top, cardW, h); cardHead(ctx, p, secDef, hue, P + 22, top + 18, inner, countOf(secDef) + ' entries'); });
+    groups.forEach((g, ci) => drawUnits(ops, g.map((i) => units[i]), P + 22 + ci * (colW + CG), top + 18 + 46 + 6));
+    y = top + h + 6;
+  }
+  /* footer */
+  const fy = y + 34;
+  ops.push((ctx) => {
+    ctx.fillStyle = p.line; ctx.fillRect(P, fy, W - 2 * P, 2);
+    ctx.font = fnt(500, 14, PF.body); ctx.fillStyle = p.fg3; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Git cheat sheet · versions like 2.23+ mean “needs that Git release or newer” · old commands keep working unless marked', P, fy + 28);
+    ctx.textAlign = 'right'; ctx.fillText(new Date().toISOString().slice(0, 10), W - P, fy + 28); ctx.textAlign = 'left';
+  });
+  return { W, H: Math.ceil(fy + 28 + P * 0.7), bg: p.bg, ops };
+}
+function renderSpec(canvas, spec, s) {
+  canvas.width = Math.max(1, Math.round(spec.W * s)); canvas.height = Math.max(1, Math.round(spec.H * s));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(canvas.width / spec.W, 0, 0, canvas.height / spec.H, 0, 0);
+  ctx.fillStyle = spec.bg; ctx.fillRect(0, 0, spec.W, spec.H);
+  spec.ops.forEach((op) => { ctx.save(); op(ctx); ctx.restore(); });
+}
+
+async function waitFonts() {
+  try {
+    if (document.fonts && document.fonts.load) {
+      await Promise.all(['800 40px "Bricolage Grotesque"', '700 16px "JetBrains Mono"', '500 14px "Manrope"', '700 14px "Manrope"'].map((f) => document.fonts.load(f, 'Git 0123 ★')));
+      await document.fonts.ready;
+    }
+  } catch (e) { /* system fonts are used instead */ }
+}
+function paintPreview() {
+  const spec = pstate.spec; if (!spec) return;
+  const cv = $('#pCanvas');
+  const fit = Math.min(1, ($('#prev').clientWidth - 32) / spec.W);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderSpec(cv, spec, Math.max(0.2, fit * dpr));
+  cv.style.width = spec.W * fit + 'px'; cv.style.height = spec.H * fit + 'px';
+}
+let rebuildT;
+function scheduleRebuild() { clearTimeout(rebuildT); rebuildT = setTimeout(refreshPreview, 100); }
+async function refreshPreview() {
+  const my = ++pstate.token;
+  const prog = $('#prog'); prog.hidden = false; prog.textContent = 'Preparing preview…';
+  $('#result').hidden = true;
+  await waitFonts();
+  if (my !== pstate.token) return;
+  try {
+    pstate.spec = compose(pstate.scope, pstate.theme || effTheme(), { ex: pstate.ex });
+    paintPreview();
+    $('#dims').textContent = `${pstate.spec.W} × ${pstate.spec.H} px at 1×`;
+  } catch (e) { $('#result').hidden = false; $('#result').textContent = 'Could not draw the preview: ' + e.message; }
+  prog.hidden = true;
+}
+function syncControls() {
+  const detailed = pstate.scope !== 'overview';
+  $('#pScope').value = pstate.scope;
+  $$('#pTheme button').forEach((b) => b.setAttribute('aria-pressed', String((pstate.theme || effTheme()) === b.dataset.v)));
+  $$('#pQual button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === pstate.quality)));
+  const ex = $('#pEx'); ex.checked = pstate.ex && detailed; ex.disabled = !detailed;
+  $('#pExLbl').title = detailed ? '' : 'The overview shows one line per command. Pick a section to include examples.';
+}
+function openPoster(scope, opener) {
+  pstate.scope = scope || 'overview'; pstate.theme = effTheme(); pstate.opener = opener || null;
+  $('#modal').hidden = false; document.body.style.overflow = 'hidden';
+  syncControls(); $('#closeM').focus();
+  refreshPreview();
+}
+function closePoster() {
+  $('#modal').hidden = true; document.body.style.overflow = '';
+  pstate.token++; pstate.spec = null;
+  if (pstate.opener && pstate.opener.focus) pstate.opener.focus();
+}
+async function saveBlob(blob, filename) {
+  try {
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if (dl) { await dl.save({ filename, data: blob }); return 'saved'; }
+  } catch (e) { if (e && e.code === 'declined') return 'declined'; }
+  try {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    return 'anchor';
+  } catch (e) { return 'failed'; }
+}
+async function exportPoster() {
+  const btn = $('#saveBtn'), prog = $('#prog'), r = $('#result');
+  btn.disabled = true; prog.hidden = false; prog.textContent = 'Rendering high-resolution image…';
+  await new Promise((res) => setTimeout(res, 30));
+  try {
+    if (!pstate.spec) await refreshPreview();
+    const spec = pstate.spec, W = spec.W, H = spec.H;
+    const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const areaCap = ios ? 16000000 : 150000000;
+    let s = Math.min(pstate.quality, Math.sqrt(areaCap / (W * H)), 30000 / Math.max(W, H));
+    let blob = null, used = s;
+    for (let attempt = 0; attempt < 4 && !blob; attempt++) {
+      used = s;
+      try {
+        const cv = document.createElement('canvas');
+        renderSpec(cv, spec, s);
+        blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
+      } catch (e) { blob = null; }
+      if (!blob) s *= 0.7;
+    }
+    if (!blob) throw new Error('render failed');
+    const name = `git-cheatsheet-${pstate.scope}-${pstate.theme || effTheme()}.png`;
+    const status = await saveBlob(blob, name);
+    r.hidden = false;
+    const px = `${Math.round(W * used)} × ${Math.round(H * used)} px`;
+    const note = used + 0.01 < pstate.quality ? ` (reduced from ${pstate.quality}× to fit browser limits)` : '';
+    if (status === 'saved') r.innerHTML = `✅ Saved <b>${esc(name)}</b> · ${px}${note}`;
+    else if (status === 'declined') r.textContent = 'Save cancelled. Press Save PNG again when you are ready.';
+    else r.innerHTML = `Image ready · ${px}${note}. If no download started, press and hold (or right-click) the image to save it.<img alt="Rendered cheat sheet" src="${URL.createObjectURL(blob)}">`;
+    window.__lastExport = { px, status };
+  } catch (e) {
+    r.hidden = false; r.textContent = 'Could not render the image. Try a lower resolution.';
+  } finally { prog.hidden = true; btn.disabled = false; }
+}
+
+/* ---------- events ---------- */
+function bind() {
+  document.addEventListener('click', (ev) => {
+    const t = ev.target;
+    const cp = t.closest('.copy'); if (cp) { copyText(cp.dataset.copy, cp); return; }
+    const fold = t.closest('[data-fold]'); if (fold) { const sec = fold.closest('.sec'); setFold(sec, sec.dataset.collapsed !== 'true'); return; }
+    const img = t.closest('[data-img]'); if (img) { openPoster(img.dataset.img, img); return; }
+    const ch = t.closest('[data-mode]'); if (ch) { state.mode = ch.dataset.mode; $$('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b === ch))); applyFilters(); return; }
+    if (t.closest('#denseBtn')) { state.dense = !state.dense; $('#denseBtn').setAttribute('aria-pressed', String(state.dense)); applyFilters(); return; }
+    if (t.closest('#themeBtn')) { toggleTheme(); if (!$('#modal').hidden) { pstate.theme = effTheme(); syncControls(); scheduleRebuild(); } return; }
+    if (t.closest('#posterBtn')) { openPoster('overview', $('#posterBtn')); return; }
+    if (t.closest('#closeM') || t.id === 'modal') { closePoster(); return; }
+    if (t.closest('#saveBtn')) { exportPoster(); return; }
+    const pt = t.closest('#pTheme button'); if (pt) { pstate.theme = pt.dataset.v; syncControls(); scheduleRebuild(); return; }
+    const pq = t.closest('#pQual button'); if (pq) { pstate.quality = Number(pq.dataset.v); syncControls(); return; }
+    const nav = t.closest('.side a, .mobnav a');
+    if (nav) { const sec = $(nav.getAttribute('href')); if (sec && sec.dataset.collapsed === 'true') setFold(sec, false); }
+  });
+  $('#pScope').addEventListener('change', (e) => { pstate.scope = e.target.value; syncControls(); scheduleRebuild(); });
+  $('#pEx').addEventListener('change', (e) => { pstate.ex = e.target.checked; scheduleRebuild(); });
+  let qt;
+  $('#q').addEventListener('input', (e) => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value.trim(); applyFilters(); }, 80); });
+  document.addEventListener('keydown', (e) => {
+    const modalOpen = !$('#modal').hidden;
+    if (e.key === 'Escape') { if (modalOpen) { closePoster(); return; } if (document.activeElement === $('#q') && $('#q').value) { $('#q').value = ''; state.q = ''; applyFilters(); } return; }
+    if (modalOpen && e.key === 'Tab') {
+      const f = $$('#modal button, #modal select, #modal input').filter((x) => !x.disabled && x.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      return;
+    }
+    if (e.key === '/' && !modalOpen && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); }
+  });
+  window.addEventListener('resize', () => { if (!$('#modal').hidden) paintPreview(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener && matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paintThemeBtn);
+  // scrollspy
+  const secs = $$('.sec');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { const id = en.target.dataset.sec; $$('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === id)); const on = $('.mobnav a.on'); if (on && on.scrollIntoView) { const bar = $('#mobnav'); if (bar.offsetParent) bar.scrollTo({ left: on.offsetLeft - 20, behavior: 'smooth' }); } } });
+    }, { rootMargin: '-140px 0px -65% 0px' });
+    secs.forEach((s) => io.observe(s));
+  }
+}
+
+function init() {
+  try { const s = localStorage.getItem('gcs-theme'); if (s === 'dark' || s === 'light') root.dataset.theme = s; } catch (e) { /* ignore */ }
+  $('#searchIco').innerHTML = ICON_SEARCH;
+  buildPage();
+  $('#pScope').innerHTML = '<option value="overview">Overview: essentials from every section</option>' +
+    SECTIONS.filter((s) => s.poster !== false).map((s) => `<option value="${s.id}">Detailed: ${esc(s.t)}</option>`).join('');
+  paintThemeBtn(); bind(); applyFilters();
+  const setHdr = () => root.style.setProperty('--hdr', $('.top').offsetHeight + 'px');
+  setHdr(); window.addEventListener('resize', setHdr);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setHdr);
+}
+init();
+})();
+
+</script>
+
+</body></html>
