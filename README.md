@@ -1,4 +1,4 @@
-**Where:** claude.ai chat (no custom instructions, no memory, free tier)
+**Where:** [claude.ai chat](https://claude.ai/share/605af969-5bb2-40b1-a003-2b73f01bea2f) (no custom instructions, no memory, free tier)
 
 **Model:** Sonnet 5.5
 
