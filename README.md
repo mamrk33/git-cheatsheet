@@ -1,3 +1,5 @@
+# Git Cheatsheet:
+
 **Where:** [claude.ai chat](https://claude.ai/share/605af969-5bb2-40b1-a003-2b73f01bea2f) (no custom instructions, no memory, free tier)
 
 **Model:** Sonnet 5.5
@@ -15,3 +17,12 @@ Add a button that would show a compact/simplified list of everything with brief 
 If you think it’s too much for a single picture, include only the most necessary things and then add options for a more detailed picture of each section
 Take your time and think it through - I want quality results
 ```
+
+
+# Git Visualized:
+
+**Where:** continuation of the chat above
+
+**Model:** Sonnet 5.5
+
+**Effort:** High
